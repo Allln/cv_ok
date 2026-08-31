@@ -241,9 +241,8 @@
         </div>
 
         <div class="lb-container">
-            <h3>>> LOCAL_TELEMETRY_LOG (Personal Best)</h3>
-            <div id="leaderboard-results">[SYS] Loading local history...</div>
-            <button class="btn" id="share-score-btn" style="margin-top: 10px; display: none; font-size: 0.8rem;">COPY STATS TO CLIPBOARD</button>
+            <h3>>> GLOBAL_TELEMETRY_FEED (Cloudflare KV)</h3>
+            <div id="leaderboard-results">[SYS] Connecting to live global nodes...</div>
         </div>
 
         <button class="btn btn-safe" id="safe-btn" disabled>OVERRIDE: INJECT SAFE DECRYPTION KEY</button>
@@ -255,6 +254,9 @@
     env.allowLocalModels = false;
     let extractor = null;
     let targetTensor = null;
+
+    // Connected to your Cloudflare Worker
+    const WORKER_API_URL = "https://cv-leaderboard-api.kaucjak.workers.dev";
 
     const encodedDictionary = [
         "YXV0b21hdGlvbg==", "Y3liZXJuZXRpY3M=", "aW50ZWxsaWdlbmNl", "bmV1cmFs", "dGVuc29y", 
@@ -269,8 +271,9 @@
     const now = new Date();
     const dayOfYear = Math.floor((now - new Date(now.getFullYear(), 0, 0)) / (1000 * 60 * 60 * 24));
     const dailyTargetWord = dictionary[dayOfYear % dictionary.length];
-    const todayDateStr = now.toISOString().split('T')[0];
     
+    const visitorName = `agent_${Math.floor(1000 + Math.random() * 9000)}`;
+
     const nodes = new vis.DataSet([
         { id: 'TARGET', label: '[ ??? ]', shape: 'hexagon', color: { background: '#111', border: '#ff003c' }, font: { color: '#ff003c', face: 'Courier New', size: 20 }, size: 30 }
     ]);
@@ -305,32 +308,46 @@
         return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
     }
 
-    function loadLocalTelemetry() {
+    async function fetchGlobalLeaderboard() {
         const lbContainer = document.getElementById('leaderboard-results');
-        const savedScore = localStorage.getItem(`breach_score_${todayDateStr}`);
-        
-        if (!savedScore) {
-            lbContainer.innerHTML = `<div style="color:var(--text-muted)">// No breach logs recorded for today (${todayDateStr}). Target is active.</div>`;
-            return;
-        }
+        try {
+            const res = await fetch(WORKER_API_URL);
+            const scores = await res.json();
+            
+            if (!scores || scores.length === 0) {
+                lbContainer.innerHTML = `<div style="color:var(--text-muted)">// No telemetry logs recorded for today. Be the first agent to breach!</div>`;
+                return;
+            }
 
-        const data = JSON.parse(savedScore);
-        lbContainer.innerHTML = `
-            <div class="lb-row">
-                <div class="lb-name">#1 STATUS: SOLVED</div>
-                <div class="progress-bar-container">
-                    <div class="progress-bar" style="width: 100%;"></div>
-                </div>
-                <div class="lb-score">${data.guesses} guesses</div>
-            </div>
-        `;
-        document.getElementById('share-score-btn').style.display = 'inline-block';
+            lbContainer.innerHTML = '';
+            scores.forEach((entry, index) => {
+                const row = document.createElement('div');
+                row.className = 'lb-row';
+                row.innerHTML = `
+                    <div class="lb-name">#${index + 1} ${entry.user}</div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" style="width: 100%;"></div>
+                    </div>
+                    <div class="lb-score">${entry.guesses} guesses</div>
+                `;
+                lbContainer.appendChild(row);
+            });
+        } catch (err) {
+            lbContainer.innerHTML = `<div style="color:var(--alert-neon)">// Failed to sync global telemetry stream.</div>`;
+        }
     }
 
-    function saveLocalTelemetry(guessesCount) {
-        const record = { date: todayDateStr, guesses: guessesCount };
-        localStorage.setItem(`breach_score_${todayDateStr}`, JSON.stringify(record));
-        loadLocalTelemetry();
+    async function submitGlobalScore(guessesCount) {
+        try {
+            await fetch(WORKER_API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user: visitorName, guesses: guessesCount })
+            });
+            fetchGlobalLeaderboard();
+        } catch (err) {
+            console.error("Global score push failed:", err);
+        }
     }
 
     async function initNeuralNet() {
@@ -348,7 +365,7 @@
             document.getElementById('guess-btn').disabled = false;
             document.getElementById('safe-btn').disabled = false;
             
-            loadLocalTelemetry();
+            fetchGlobalLeaderboard();
         } catch (err) {
             console.error(err);
             document.getElementById('system-status').innerText = '[SYS] ERROR: Failed to load ONNX weights.';
@@ -378,7 +395,7 @@
             
             if (score > 99) {
                 triggerWin();
-                saveLocalTelemetry(guessCount);
+                submitGlobalScore(guessCount);
             }
         } catch (err) {
             console.error(err);
@@ -435,7 +452,7 @@
     }
 
     function triggerWin() {
-        document.getElementById('system-status').innerText = '[SYS] TARGET ACQUIRED. BREACH SUCCESSFUL.';
+        document.getElementById('system-status').innerText = '[SYS] TARGET ACQUIRED. GLOBAL TELEMETRY UPDATED.';
         document.getElementById('system-status').style.color = '#ffffff';
         document.getElementById('guess-input').disabled = true;
         document.getElementById('guess-btn').disabled = true;
@@ -449,13 +466,6 @@
             shape: 'star'
         });
     }
-
-    document.getElementById('share-score-btn').addEventListener('click', () => {
-        const saved = JSON.parse(localStorage.getItem(`breach_score_${todayDateStr}`));
-        const text = `>> NEURAL_LINK_BREACH // ${todayDateStr}\nStatus: SUCCESS\nGuesses: ${saved.guesses}`;
-        navigator.clipboard.writeText(text);
-        alert('Telemetry stats copied to clipboard!');
-    });
 
     document.getElementById('jump-to-minigame').addEventListener('click', function() {
         this.classList.remove('blink-prompt');
@@ -477,7 +487,7 @@
         document.getElementById('minigame').classList.remove('attention-pulse');
         renderResult(dailyTargetWord, 100);
         triggerWin();
-        saveLocalTelemetry(guessCount || 1);
+        submitGlobalScore(guessCount || 1);
     });
 
     initNeuralNet();

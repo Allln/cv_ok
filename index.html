@@ -279,7 +279,16 @@
         "dmFyaWFibGU=", "dmVjdG9y=", "dmlydHVhbA==", "dmlydHVhbGl6YXRpb24=", "dnVsbmVyYWJpbGl0eQ==",
         "d2Vic29ja2V0=", "d2lkZ2V0=", "d29ya2Zsb3c="
     ];
-    const dictionary = encodedDictionary.map(s => atob(s));
+const dictionary = encodedDictionary.map(s => {
+    try {
+        // Fix missing padding automatically
+        const padded = s + '='.repeat((4 - s.length % 4) % 4);
+        return atob(padded);
+    } catch (e) {
+        console.error(`[SYS] Failed to decode token: ${s}`, e);
+        return null;
+    }
+}).filter(Boolean); // Filter out any corrupted entries
 
     const now = new Date();
     const dayOfYear = Math.floor((now - new Date(now.getFullYear(), 0, 0)) / (1000 * 60 * 60 * 24));

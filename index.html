@@ -256,52 +256,33 @@
     let targetTensor = null;
 
     const WORKER_API_URL = "https://cv-leaderboard-api.kaucjak.workers.dev";
-
-const encodedDictionary = [
-        "YWRhcHRpdmU=", "YWdlbnQ=", "YWxnb3JpdGht=", "YW5hbHl0aWNz=", "YXN5bmNocm9ub3Vz=", "YXV0b21hdGlvbg==",
-        "YmFja2VuZA==", "YmFuZHdpZHRo=", "YmluYXJ5=", "Ym90bmV0=", "Ym90dGxlbmVjay==", "Ynl0ZWNvZGU=",
-        "Y2x1c3Rlcg==", "Y29tcGlsZXI=", "Y29tcHV0ZQ==", "Y29udGFpbmVy=", "ZGFlbW9u=", "ZGF0YWJhc2U=",
-        "ZGVidWdnaW5n=", "ZGVwbG95=", "ZGlzdHJpYnV0ZWQ=", "ZG9ja2Vy=", "ZG9tYWlu=", "ZW5jcnlwdGlvbg==",
-        "ZXRoZXJuZXQ=", "ZmlyZXdhbGw=", "ZmlybXdhcmU=", "ZnJhbWV3b3Jr", "Z2F0ZXdheQ==", "Z3JhZGllbnQ=",
-        "aGFyZHdhcmU=", "aGFzaA==", "aGV1cmlzdGlj=", "aHlwZXJ2aXNvcg==", "aW5kZXg=", "aW5oZXJpdGFuY2U=",
-        "aW5qZWN0aW9u=", "aW5zdGFuY2U=", "aW50ZXJmYWNl=", "aW50ZXJwcmV0ZXI=", "aXRlcmF0aW9u=", "amF2YXNjcmlwdA==",
-        "anNvbg==", "a2VybmVs=", "a3ViZXJuZXRlcw==", "bGF0ZW5jeQ==", "bGlicmFyeQ==", "bG9hZGJhbGFuY2luZw==",
-        "bG9ja3k=", "bG9nZ2luZw==", "bWFsd2FyZQ==", "bWVtb3J5=", "bWljcm9zZXJ2aWNl=", "bWlkZGxld2FyZQ==",
-        "bW9ub2xpdGg=", "bXVsdGl0aHJlYWRpbmc=", "bmFtc3BhY2U=", "bmV0d29yaw==", "bm9kZQ==", "b2JqZWN0=",
-        "b3B0aW1pemF0aW9u=", "cGFja2V0=", "cGF0Y2g=", "cGF5bG9hZA==", "cGlwZWxpbmU=", "cG9pbnRlcg==",
-        "cG9seW1vcnBoaXNt=", "cHJvY2Vzcw==", "cHJvdG9jb2w=", "cXVlcnk=", "cXVldWU=", "cXVhbnR1bQ==",
-        "cmVjdXJzaW9u=", "cmVmYWN0b3I=", "cmVwb3NpdG9yeQ==", "cmVxdWVzdA==", "cmVzb3VyY2U=", "cmVzcG9uc2U=",
-        "cmVzdGFwaQ==", "cm91dGVy=", "cnVudGltZQ==", "c2NhbGFiaWxpdHk=", "c2NhbGFy=", "c2FuZGJveA==",
-        "c2NyaXB0=", "c2VnbWVudGF0aW9u=", "c2VydmVy=", "c2Vzc2lvbg==", "c2hlbGw=", "c25pcHBldA==",
-        "c29ja2V0=", "c291cmNl=", "c3RhY2s=", "c3RhdGU=", "c3RhdGlj=", "c3RyZWFt=",
-        "c3RyaW5n=", "c3Vicm91dGluZQ==", "c3luYXBzZQ==", "c3ludGF4=", "dGVsZXRlbHJ5=", "dGVuc29y=",
-        "dGhyZWFk=", "dG9rZW4=", "dHJhbnNhY3Rpb24=", "dHVubmVs=", "dW5pY29kZQ==", "dXRpbGl0eQ==",
-        "dmFyaWFibGU=", "dmVjdG9y=", "dmlydHVhbA==", "dmlydHVhbGl6YXRpb24=", "dnVsbmVyYWJpbGl0eQ==",
-        "d2Vic29ja2V0=", "d2lkZ2V0=", "d29ya2Zsb3c="
+//you sneaky rogue, do not cheat i see you (proper hashing deserved..if you want to ask)
+const techDictionary = [
+        "algorithm", "analytics", "asynchronous", "automation", "backend", 
+        "bandwidth", "binary", "botnet", "bottleneck", "bytecode", "cluster", 
+        "compiler", "compute", "container", "daemon", "database", "debugging", 
+        "deploy", "distributed", "docker", "domain", "encryption", "ethernet", 
+        "firewall", "firmware", "framework", "gateway", "gradient", "hardware", 
+        "hash", "heuristic", "hypervisor", "index", "inheritance", "injection", 
+        "instance", "interface", "interpreter", "iteration", "javascript", 
+        "json", "kernel", "kubernetes", "latency", "library", "loadbalancer", 
+        "logging", "malware", "memory", "microservice", "middleware", "monolith", 
+        "multithreading", "namespace", "network", "node", "object", "optimization", 
+        "packet", "patch", "payload", "pipeline", "pointer", "polymorphism", 
+        "process", "protocol", "query", "queue", "quantum", "recursion", 
+        "refactor", "repository", "request", "resource", "response", "restapi", 
+        "router", "runtime", "scalability", "scalar", "sandbox", "script", 
+        "segmentation", "server", "session", "shell", "snippet", "socket", 
+        "source", "stack", "state", "static", "stream", "string", "subroutine", 
+        "synapse", "syntax", "telemetry", "tensor", "thread", "token", 
+        "transaction", "tunnel", "unicode", "utility", "variable", "vector", 
+        "virtual", "virtualization", "vulnerability", "websocket", "widget", "workflow"
     ];
 
-    const dictionary = encodedDictionary.map(s => {
-        try {
-            const cleanStr = s.trim().replace(/[\n\r]/g, '');
-            const paddingNeeded = (4 - (cleanStr.length % 4)) % 4;
-            const paddedStr = cleanStr + '='.repeat(paddingNeeded);
-            
-            // Handle UTF-8 safely for browser atob output
-            const binString = atob(paddedStr);
-            const bytes = Uint8Array.from(binString, (m) => m.codePointAt(0));
-            return new TextDecoder().decode(bytes);
-        } catch (err) {
-            console.warn(`[SYS] Falling back on raw string for: ${s}`);
-            return s; // Fallback to raw string if decoding fails completely
-        }
-    }).filter(Boolean);
-
-    const safeDictionary = dictionary.length > 0 ? dictionary : ['algorithm', 'pipeline', 'tensor', 'neural'];
-    
     const now = new Date();
     const startOfYear = new Date(now.getFullYear(), 0, 1);
     const dayOfYear = Math.floor((now - startOfYear) / (1000 * 60 * 60 * 24));
-    const dailyTargetWord = safeDictionary[dayOfYear % safeDictionary.length];
+    const dailyTargetWord = techDictionary[dayOfYear % techDictionary.length];
     
     const visitorName = `agent_${Math.floor(1000 + Math.random() * 9000)}`;
 

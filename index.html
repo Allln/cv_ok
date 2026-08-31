@@ -255,7 +255,6 @@
     let extractor = null;
     let targetTensor = null;
 
-    // Connected to your Cloudflare Worker
     const WORKER_API_URL = "https://cv-leaderboard-api.kaucjak.workers.dev";
 
     const encodedDictionary = [
@@ -323,13 +322,23 @@
             scores.forEach((entry, index) => {
                 const row = document.createElement('div');
                 row.className = 'lb-row';
-                row.innerHTML = `
-                    <div class="lb-name">#${index + 1} ${entry.user}</div>
-                    <div class="progress-bar-container">
-                        <div class="progress-bar" style="width: 100%;"></div>
-                    </div>
-                    <div class="lb-score">${entry.guesses} guesses</div>
-                `;
+                
+                const nameDiv = document.createElement('div');
+                nameDiv.className = 'lb-name';
+                // SECURE: Use textContent instead of innerHTML to completely block XSS injection payloads
+                nameDiv.textContent = `#${index + 1} ${entry.user}`;
+
+                const barContainer = document.createElement('div');
+                barContainer.className = 'progress-bar-container';
+                barContainer.innerHTML = `<div class="progress-bar" style="width: 100%;"></div>`;
+
+                const scoreDiv = document.createElement('div');
+                scoreDiv.className = 'lb-score';
+                scoreDiv.textContent = `${entry.guesses} guesses`;
+
+                row.appendChild(nameDiv);
+                row.appendChild(barContainer);
+                row.appendChild(scoreDiv);
                 lbContainer.appendChild(row);
             });
         } catch (err) {

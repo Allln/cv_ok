@@ -241,8 +241,9 @@
         </div>
 
         <div class="lb-container">
-            <h3>>> DAILY_LEADERBOARD (Global Automated)</h3>
-            <div id="leaderboard-results">[SYS] Loading global telemetry...</div>
+            <h3>>> LOCAL_TELEMETRY_LOG (Personal Best)</h3>
+            <div id="leaderboard-results">[SYS] Loading local history...</div>
+            <button class="btn" id="share-score-btn" style="margin-top: 10px; display: none; font-size: 0.8rem;">COPY STATS TO CLIPBOARD</button>
         </div>
 
         <button class="btn btn-safe" id="safe-btn" disabled>OVERRIDE: INJECT SAFE DECRYPTION KEY</button>
@@ -254,9 +255,6 @@
     env.allowLocalModels = false;
     let extractor = null;
     let targetTensor = null;
-
-    // Config for Free Automated JSON Endpoint (Replace with your npoint.io bin ID url)
-    const BIN_API_URL = "https://api.npoint.io/a0353a8ce425683a181c";
 
     const encodedDictionary = [
         "YXV0b21hdGlvbg==", "Y3liZXJuZXRpY3M=", "aW50ZWxsaWdlbmNl", "bmV1cmFs", "dGVuc29y", 
@@ -273,8 +271,6 @@
     const dailyTargetWord = dictionary[dayOfYear % dictionary.length];
     const todayDateStr = now.toISOString().split('T')[0];
     
-    const anonymousUser = `user_${Math.floor(100 + Math.random() * 900)}`;
-
     const nodes = new vis.DataSet([
         { id: 'TARGET', label: '[ ??? ]', shape: 'hexagon', color: { background: '#111', border: '#ff003c' }, font: { color: '#ff003c', face: 'Courier New', size: 20 }, size: 30 }
     ]);
@@ -309,71 +305,32 @@
         return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
     }
 
-    async function fetchLeaderboard() {
+    function loadLocalTelemetry() {
         const lbContainer = document.getElementById('leaderboard-results');
-        try {
-            const res = await fetch(BIN_API_URL);
-            const data = await res.json();
-            
-            let scores = [];
-            if (data && Array.isArray(data.scores)) {
-                scores = data.scores.filter(entry => entry.date === todayDateStr);
-            }
-
-            scores.sort((a, b) => a.guesses - b.guesses || b.score - a.score);
-            
-            if (scores.length === 0) {
-                lbContainer.innerHTML = `<div style="color:var(--text-muted)">// No telemetry entries recorded for today (${todayDateStr}). Be the first!</div>`;
-                return;
-            }
-
-            lbContainer.innerHTML = '';
-            scores.slice(0, 5).forEach((entry, index) => {
-                const row = document.createElement('div');
-                row.className = 'lb-row';
-                row.innerHTML = `
-                    <div class="lb-name">#${index + 1} ${entry.user}</div>
-                    <div class="progress-bar-container">
-                        <div class="progress-bar" style="width: ${entry.score}%;"></div>
-                    </div>
-                    <div class="lb-score">${entry.guesses} guesses</div>
-                `;
-                lbContainer.appendChild(row);
-            });
-        } catch (err) {
-            lbContainer.innerHTML = `<div style="color:var(--alert-neon)">// Failed to sync telemetry feed.</div>`;
+        const savedScore = localStorage.getItem(`breach_score_${todayDateStr}`);
+        
+        if (!savedScore) {
+            lbContainer.innerHTML = `<div style="color:var(--text-muted)">// No breach logs recorded for today (${todayDateStr}). Target is active.</div>`;
+            return;
         }
+
+        const data = JSON.parse(savedScore);
+        lbContainer.innerHTML = `
+            <div class="lb-row">
+                <div class="lb-name">#1 STATUS: SOLVED</div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar" style="width: 100%;"></div>
+                </div>
+                <div class="lb-score">${data.guesses} guesses</div>
+            </div>
+        `;
+        document.getElementById('share-score-btn').style.display = 'inline-block';
     }
 
-    async function submitScore(guessesCount) {
-        try {
-            // 1. Fetch current scores
-            const res = await fetch(BIN_API_URL);
-            let data = await res.json();
-            if (!data || !Array.isArray(data.scores)) {
-                data = { scores: [] };
-            }
-
-            // 2. Append new score
-            data.scores.push({
-                date: todayDateStr,
-                user: anonymousUser,
-                guesses: guessesCount,
-                score: 100
-            });
-
-            // 3. Save back to json bin automatically
-            await fetch(BIN_API_URL, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            });
-
-            // Refresh view
-            fetchLeaderboard();
-        } catch (err) {
-            console.error("Auto-submission failed:", err);
-        }
+    function saveLocalTelemetry(guessesCount) {
+        const record = { date: todayDateStr, guesses: guessesCount };
+        localStorage.setItem(`breach_score_${todayDateStr}`, JSON.stringify(record));
+        loadLocalTelemetry();
     }
 
     async function initNeuralNet() {
@@ -391,10 +348,10 @@
             document.getElementById('guess-btn').disabled = false;
             document.getElementById('safe-btn').disabled = false;
             
-            fetchLeaderboard();
+            loadLocalTelemetry();
         } catch (err) {
             console.error(err);
-            document.getElementById('system-status').innerText = '[SYS] ERROR: Failed to load ONNX weights. Check console.';
+            document.getElementById('system-status').innerText = '[SYS] ERROR: Failed to load ONNX weights.';
             document.getElementById('system-status').style.color = 'var(--alert-neon)';
         }
     }
@@ -421,7 +378,7 @@
             
             if (score > 99) {
                 triggerWin();
-                submitScore(guessCount);
+                saveLocalTelemetry(guessCount);
             }
         } catch (err) {
             console.error(err);
@@ -478,7 +435,7 @@
     }
 
     function triggerWin() {
-        document.getElementById('system-status').innerText = '[SYS] TARGET ACQUIRED. BREACH SUCCESSFUL. SCORE SAVED AUTOMATICALLY.';
+        document.getElementById('system-status').innerText = '[SYS] TARGET ACQUIRED. BREACH SUCCESSFUL.';
         document.getElementById('system-status').style.color = '#ffffff';
         document.getElementById('guess-input').disabled = true;
         document.getElementById('guess-btn').disabled = true;
@@ -492,6 +449,13 @@
             shape: 'star'
         });
     }
+
+    document.getElementById('share-score-btn').addEventListener('click', () => {
+        const saved = JSON.parse(localStorage.getItem(`breach_score_${todayDateStr}`));
+        const text = `>> NEURAL_LINK_BREACH // ${todayDateStr}\nStatus: SUCCESS\nGuesses: ${saved.guesses}`;
+        navigator.clipboard.writeText(text);
+        alert('Telemetry stats copied to clipboard!');
+    });
 
     document.getElementById('jump-to-minigame').addEventListener('click', function() {
         this.classList.remove('blink-prompt');
@@ -513,7 +477,7 @@
         document.getElementById('minigame').classList.remove('attention-pulse');
         renderResult(dailyTargetWord, 100);
         triggerWin();
-        submitScore(guessCount || 1);
+        saveLocalTelemetry(guessCount || 1);
     });
 
     initNeuralNet();

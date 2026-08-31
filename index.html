@@ -331,7 +331,7 @@
             const targetOutput = await extractor(dailyTargetWord, { pooling: 'mean', normalize: true });
             targetTensor = targetOutput.data; 
             
-            statusEl.innerText = '[SYS] Neural Link Established. Daily target embedded in latent space.';
+            statusEl.innerText = '[SYS] Initialized... Daily target embedded in latent space.';
             statusEl.style.color = 'var(--main-neon)';
             
             document.getElementById('guess-input').disabled = false;

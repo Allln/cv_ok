@@ -241,7 +241,7 @@
         </div>
 
         <div class="lb-container">
-            <h3>>> DAILY_LEADERBOARD (Global Anonymous)</h3>
+            <h3>>> DAILY_LEADERBOARD (Global Automated)</h3>
             <div id="leaderboard-results">[SYS] Loading global telemetry...</div>
         </div>
 
@@ -255,9 +255,8 @@
     let extractor = null;
     let targetTensor = null;
 
-    const REPO_OWNER = "Allln";        
-    const REPO_NAME = "cv_ok";        
-    const ISSUE_NUMBER = 2;             
+    // Config for Free Automated JSON Endpoint (Replace with your npoint.io bin ID url)
+    const BIN_API_URL = "https://api.npoint.io/YOUR_BIN_ID_HERE";
 
     const encodedDictionary = [
         "YXV0b21hdGlvbg==", "Y3liZXJuZXRpY3M=", "aW50ZWxsaWdlbmNl", "bmV1cmFs", "dGVuc29y", 
@@ -313,25 +312,14 @@
     async function fetchLeaderboard() {
         const lbContainer = document.getElementById('leaderboard-results');
         try {
-            const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/issues/${ISSUE_NUMBER}/comments?per_page=100`);
-            const comments = await res.json();
+            const res = await fetch(BIN_API_URL);
+            const data = await res.json();
             
             let scores = [];
-            if (Array.isArray(comments)) {
-                comments.forEach(c => {
-                    try {
-                        // Parse JSON comments matching today's date format: {"date":"YYYY-MM-DD","user":"user_123","guesses":4,"score":100}
-                        const data = JSON.parse(c.body.trim());
-                        if (data.date === todayDateStr) {
-                            scores.push(data);
-                        }
-                    } catch (e) {
-                        // Ignore standard text comments
-                    }
-                });
+            if (data && Array.isArray(data.scores)) {
+                scores = data.scores.filter(entry => entry.date === todayDateStr);
             }
 
-            // Sort by lowest guesses first, then highest score
             scores.sort((a, b) => a.guesses - b.guesses || b.score - a.score);
             
             if (scores.length === 0) {
@@ -358,21 +346,34 @@
     }
 
     async function submitScore(guessesCount) {
-        const payload = JSON.stringify({
-            date: todayDateStr,
-            user: anonymousUser,
-            guesses: guessesCount,
-            score: 100
-        });
-        
-        // Open pre-populated GitHub issue comment window so user can securely publish anonymously with 1 click
-        const issueUrl = `https://github.com/${REPO_OWNER}/${REPO_NAME}/issues/${ISSUE_NUMBER}#new_comment_field`;
-        
-        const lbContainer = document.getElementById('leaderboard-results');
-        const notice = document.createElement('div');
-        notice.style.marginTop = "10px";
-        notice.innerHTML = `> TARGET CRACKED! <a href="${issueUrl}" target="_blank" style="color:#fff; font-weight:bold;">[ CLICK HERE TO BROADCAST SCORE AS ${anonymousUser.toUpperCase()} ]</a>`;
-        lbContainer.prepend(notice);
+        try {
+            // 1. Fetch current scores
+            const res = await fetch(BIN_API_URL);
+            let data = await res.json();
+            if (!data || !Array.isArray(data.scores)) {
+                data = { scores: [] };
+            }
+
+            // 2. Append new score
+            data.scores.push({
+                date: todayDateStr,
+                user: anonymousUser,
+                guesses: guessesCount,
+                score: 100
+            });
+
+            // 3. Save back to json bin automatically
+            await fetch(BIN_API_URL, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            // Refresh view
+            fetchLeaderboard();
+        } catch (err) {
+            console.error("Auto-submission failed:", err);
+        }
     }
 
     async function initNeuralNet() {
@@ -477,7 +478,7 @@
     }
 
     function triggerWin() {
-        document.getElementById('system-status').innerText = '[SYS] TARGET ACQUIRED. BREACH SUCCESSFUL.';
+        document.getElementById('system-status').innerText = '[SYS] TARGET ACQUIRED. BREACH SUCCESSFUL. SCORE SAVED AUTOMATICALLY.';
         document.getElementById('system-status').style.color = '#ffffff';
         document.getElementById('guess-input').disabled = true;
         document.getElementById('guess-btn').disabled = true;

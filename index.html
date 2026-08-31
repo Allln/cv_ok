@@ -317,7 +317,6 @@ async function fetchGlobalLeaderboard() {
                 return;
             }
 
-            // Find the minimum guess count (winner/best score has the fewest guesses)
             const minGuesses = Math.min(...scores.map(e => e.guesses));
 
             lbContainer.innerHTML = '';

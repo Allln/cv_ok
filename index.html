@@ -306,8 +306,7 @@
         if (normA === 0 || normB === 0) return 0;
         return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
     }
-
-    async function fetchGlobalLeaderboard() {
+async function fetchGlobalLeaderboard() {
         const lbContainer = document.getElementById('leaderboard-results');
         try {
             const res = await fetch(WORKER_API_URL);
@@ -318,6 +317,9 @@
                 return;
             }
 
+            // Find the minimum guess count (winner/best score has the fewest guesses)
+            const minGuesses = Math.min(...scores.map(e => e.guesses));
+
             lbContainer.innerHTML = '';
             scores.forEach((entry, index) => {
                 const row = document.createElement('div');
@@ -325,12 +327,14 @@
                 
                 const nameDiv = document.createElement('div');
                 nameDiv.className = 'lb-name';
-                // SECURE: Use textContent instead of innerHTML to completely block XSS injection payloads
                 nameDiv.textContent = `#${index + 1} ${entry.user}`;
+
+                // Calculate relative bar width (fewest guesses gets 100%, others scale down)
+                const barWidth = Math.max(15, Math.min(100, (minGuesses / entry.guesses) * 100));
 
                 const barContainer = document.createElement('div');
                 barContainer.className = 'progress-bar-container';
-                barContainer.innerHTML = `<div class="progress-bar" style="width: 100%;"></div>`;
+                barContainer.innerHTML = `<div class="progress-bar" style="width: ${barWidth}%;"></div>`;
 
                 const scoreDiv = document.createElement('div');
                 scoreDiv.className = 'lb-score';
@@ -345,7 +349,6 @@
             lbContainer.innerHTML = `<div style="color:var(--alert-neon)">// Failed to sync global telemetry stream.</div>`;
         }
     }
-
     async function submitGlobalScore(guessesCount) {
         try {
             await fetch(WORKER_API_URL, {

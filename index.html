@@ -257,7 +257,7 @@
 
     const WORKER_API_URL = "https://cv-leaderboard-api.kaucjak.workers.dev";
 
-    const encodedDictionary = [
+const encodedDictionary = [
         "YWRhcHRpdmU=", "YWdlbnQ=", "YWxnb3JpdGht=", "YW5hbHl0aWNz=", "YXN5bmNocm9ub3Vz=", "YXV0b21hdGlvbg==",
         "YmFja2VuZA==", "YmFuZHdpZHRo=", "YmluYXJ5=", "Ym90bmV0=", "Ym90dGxlbmVjay==", "Ynl0ZWNvZGU=",
         "Y2x1c3Rlcg==", "Y29tcGlsZXI=", "Y29tcHV0ZQ==", "Y29udGFpbmVy=", "ZGFlbW9u=", "ZGF0YWJhc2U=",
@@ -279,20 +279,29 @@
         "dmFyaWFibGU=", "dmVjdG9y=", "dmlydHVhbA==", "dmlydHVhbGl6YXRpb24=", "dnVsbmVyYWJpbGl0eQ==",
         "d2Vic29ja2V0=", "d2lkZ2V0=", "d29ya2Zsb3c="
     ];
-const dictionary = encodedDictionary.map(s => {
-    try {
-        // Fix missing padding automatically
-        const padded = s + '='.repeat((4 - s.length % 4) % 4);
-        return atob(padded);
-    } catch (e) {
-        console.error(`[SYS] Failed to decode token: ${s}`, e);
-        return null;
-    }
-}).filter(Boolean); // Filter out any corrupted entries
 
+    const dictionary = encodedDictionary.map(s => {
+        try {
+            const cleanStr = s.trim().replace(/[\n\r]/g, '');
+            const paddingNeeded = (4 - (cleanStr.length % 4)) % 4;
+            const paddedStr = cleanStr + '='.repeat(paddingNeeded);
+            
+            // Handle UTF-8 safely for browser atob output
+            const binString = atob(paddedStr);
+            const bytes = Uint8Array.from(binString, (m) => m.codePointAt(0));
+            return new TextDecoder().decode(bytes);
+        } catch (err) {
+            console.warn(`[SYS] Falling back on raw string for: ${s}`);
+            return s; // Fallback to raw string if decoding fails completely
+        }
+    }).filter(Boolean);
+
+    const safeDictionary = dictionary.length > 0 ? dictionary : ['algorithm', 'pipeline', 'tensor', 'neural'];
+    
     const now = new Date();
-    const dayOfYear = Math.floor((now - new Date(now.getFullYear(), 0, 0)) / (1000 * 60 * 60 * 24));
-    const dailyTargetWord = dictionary[dayOfYear % dictionary.length];
+    const startOfYear = new Date(now.getFullYear(), 0, 1);
+    const dayOfYear = Math.floor((now - startOfYear) / (1000 * 60 * 60 * 24));
+    const dailyTargetWord = safeDictionary[dayOfYear % safeDictionary.length];
     
     const visitorName = `agent_${Math.floor(1000 + Math.random() * 9000)}`;
 

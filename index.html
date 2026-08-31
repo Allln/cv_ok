@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oldřich Kaucký | ML & Automation</title>
+    <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #050505;
+            --main-neon: #00ff41;
+            --alert-neon: #ff003c;
+            --text-muted: #2d7337;
+            --font-mono: 'Courier New', Courier, monospace;
+        }
+        body {
+            background-color: var(--bg-color);
+            color: var(--main-neon);
+            font-family: var(--font-mono);
+            margin: 0;
+            padding: 2rem;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        body::after {
+            content: " ";
+            display: block;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 999;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+        }
+        h1, h2, h3 {
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 5px var(--main-neon);
+        }
+        .glitch {
+            position: relative;
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--main-neon);
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 3;
+        }
+        .preamble {
+            border-left: 4px solid var(--main-neon);
+            padding: 1rem 1.5rem;
+            margin-bottom: 2rem;
+            background: rgba(0, 255, 65, 0.05);
+        }
+        .section {
+            border: 1px solid var(--text-muted);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            background: rgba(0, 255, 65, 0.02);
+            box-shadow: inset 0 0 10px rgba(0, 255, 65, 0.05);
+            transition: all 0.3s ease;
+        }
+        @keyframes pulseAlert {
+            0% { box-shadow: 0 0 10px rgba(0, 255, 65, 0.2), inset 0 0 10px rgba(0, 255, 65, 0.1); border-color: var(--text-muted); }
+            50% { box-shadow: 0 0 25px rgba(0, 255, 65, 0.8), inset 0 0 20px rgba(0, 255, 65, 0.4); border-color: var(--main-neon); }
+            100% { box-shadow: 0 0 10px rgba(0, 255, 65, 0.2), inset 0 0 10px rgba(0, 255, 65, 0.1); border-color: var(--text-muted); }
+        }
+
+        .attention-pulse {
+            animation: pulseAlert 2s infinite;
+        }
+        @keyframes subtleBlink {
+            0%, 70% { opacity: 1; }
+            85% { opacity: 0.45; }
+            100% { opacity: 1; }
+        }
+        .blink-prompt {
+            animation: subtleBlink 2.2s ease-in-out infinite;
+        }
+
+        .execute-blink {
+            animation: subtleBlink 1.8s ease-in-out infinite;
+        }
+
+        .tag {
+            display: inline-block;
+            background: var(--text-muted);
+            color: var(--bg-color);
+            padding: 2px 8px;
+            margin: 2px;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+
+        .terminal-input {
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid var(--main-neon);
+            color: var(--main-neon);
+            font-family: var(--font-mono);
+            font-size: 1.2rem;
+            padding: 5px;
+            width: 60%;
+        }
+        .terminal-input:focus {
+            outline: none;
+            box-shadow: 0 4px 2px -2px var(--main-neon);
+        }
+
+        .terminal-input:disabled {
+            border-bottom: 2px solid var(--text-muted);
+            color: var(--text-muted);
+        }
+
+        .btn {
+            background: transparent;
+            border: 1px solid var(--main-neon);
+            color: var(--main-neon);
+            padding: 8px 15px;
+            font-family: var(--font-mono);
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all 0.2s;
+        }
+
+        .btn:hover:not(:disabled) {
+            background: var(--main-neon);
+            color: var(--bg-color);
+            box-shadow: 0 0 10px var(--main-neon);
+        }
+
+        .btn:disabled {
+            border: 1px solid var(--text-muted);
+            color: var(--text-muted);
+            cursor: not-allowed;
+        }
+        .btn-safe {
+            border-color: var(--alert-neon);
+            color: var(--alert-neon);
+            font-size: 0.8rem;
+            margin-top: 15px;
+        }
+        .btn-safe:hover:not(:disabled) {
+            background: var(--alert-neon);
+            color: var(--bg-color);
+            box-shadow: 0 0 10px var(--alert-neon);
+        }
+        .game-dashboard {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-top: 1.5rem;
+        }
+
+        #network-graph {
+            width: 100%;
+            height: 350px;
+            background: #0a0a0a;
+            border: 1px solid var(--text-muted);
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+        }
+        #game-results {
+            max-height: 200px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+        #game-results::-webkit-scrollbar { width: 5px; }
+        #game-results::-webkit-scrollbar-track { background: #111; }
+        #game-results::-webkit-scrollbar-thumb { background: var(--text-muted); }
+        .guess-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .guess-word {
+            width: 120px;
+            font-weight: bold;
+        }
+        .progress-bar-container {
+            flex-grow: 1;
+            background: #111;
+            height: 15px;
+            margin: 0 15px;
+            border: 1px solid var(--text-muted);
+        }
+        .progress-bar {
+            height: 100%;
+            background: var(--main-neon);
+            transition: width 0.5s ease-out;
+        }
+        .guess-score {
+            width: 60px;
+            text-align: right;
+        }
+        #system-status {
+            color: #ffaa00;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        a {
+            color: var(--main-neon);
+            text-decoration: none;
+            border-bottom: 1px dotted var(--main-neon);
+            transition: 0.2s;
+        }
+        
+        a:hover {
+            background-color: var(--main-neon);
+            color: var(--bg-color);
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header style="margin-bottom: 2rem;">
+        <div class="glitch">Oldřich Kaucký</div>
+        <h3>ML/Automation Engineer & Technical Consultant // Prague, CZ</h3>
+        <p>Contact: <a href="mailto:kaucjak@gmail.com">kaucjak@gmail.com</a> | +420 720 316 940 | <a href="https://github.com/Allln" target="_blank" rel="noopener noreferrer">https://github.com/Allln</a></p>
+    </header>
+    <div class="preamble">
+        <p style="margin-top: 0; font-size: 1.1rem;">
+            <strong>>> MOTTO:</strong> <em>"I like finding the smart, lazy way through problems, but I trust the data over the story people tell me."</em>
+        </p>
+        <p style="margin-bottom: 0; color: #aaa;">
+            > <strong>SYSTEM ADVISORY:</strong> Before processing my professional execution logs below, it is highly recommended you test your semantic alignment... <a href="#minigame" id="jump-to-minigame" class="blink-prompt" style="font-weight: bold;">[ JUMP TO MINIGAME ]</a>
+        </p>
+    </div>
+    <section class="section" id="manifesto">
+        <h2>>> INIT_PHILOSOPHY.sh</h2>
+        <p>In the current wave of AI-driven automation, reliability has to come before coverage. A model that performs well in validation but fails silently in production is a bigger risk than not automating the task at all. I route only high-confidence predictions to full automation, accepting a lower automation rate in exchange for near-zero silent failures.</p>
+    </section>
+    <section class="section" id="experience">
+        <h2>>> EXEC_EXPERIENCE.bin</h2>
+<p><strong>Freelance ML & Automation Consulting (2025 - Present):</strong> Prototyping and deploying AI-driven solutions to streamline workflows, including LLM agent pipelines, intelligent classification, email processing, and knowledge-graph-backed search engines. Ongoing work spans advanced document-processing systems and agentic pipelines for parsing, searching, and applying legal regulations.</p>
+     <p><strong>EXON s.r.o. - ML Backend Developer (2020 - Present):</strong> Engineered robust microservice backends for structured and tabular data, including computer vision applications such as font-type detection, handwriting recognition, and OCR. Evolved core systems from classical ML and automation toward advanced OCR backends and production-grade LLM agent pipelines. Deployed open-weight LLMs on local GPU infrastructure for fully on-premise AI solutions where data privacy, reliability, and infrastructure control are critical.</p>
+        <p><strong>Independent Algorithmic Trading (~6 years):</strong> Designed an adaptive framework for developing and testing trading models spanning white-box to black-box approaches, utilizing the Interactive Brokers (IBKR) API for ongoing paper and live execution.</p>    </section>
+    <section class="section" id="stack">
+        <h2>>> RECENT_DEPENDENCIES.log</h2>
+        <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: -10px; margin-bottom: 15px;">
+        // A snapshot of the stack powering the latest deployments. *The underlying architecture is what scales.
+        </p>
+        <div>
+            <span class="tag">LlamaIndex</span> <span class="tag">LangChain</span> <span class="tag">LangGraph</span> <span class="tag">Ollama</span> <span class="tag">vLLM</span> <span class="tag">NL2SQL</span>
+            <span class="tag">PyTorch</span> <span class="tag">Transformers</span> <span class="tag">EasyOCR</span> <span class="tag">OpenMMLab</span> <span class="tag">TensorFlow</span>
+            <span class="tag">Knowledge Graphs</span> <span class="tag">Vector DBs</span> <span class="tag">RAG Pipelines</span> <span class="tag">Pydantic</span>
+            <span class="tag">FastAPI</span> <span class="tag">GCP</span> <span class="tag">Kubernetes</span> <span class="tag">Docker Compose</span> <span class="tag">RabbitMQ</span> <span class="tag">On-Prem LLMs</span>
+        </div>
+    </section>
+    <section class="section attention-pulse" id="minigame">
+        <h2>>> NEURAL_LINK_BREACH (Semantic Guesser) using *all-MiniLM-L6-v2</h2>
+    <p>Target locked. A daily target word is hidden in the latent space. Show me your skills, Sherlock.</p>
+    <div id="system-status">[SYS] Initializing... </div>
+
+        <div style="display: flex; gap: 10px;">
+            <span style="font-size: 1.2rem; line-height: 2rem;">></span>
+            <input type="text" id="guess-input" class="terminal-input" placeholder="Enter semantic token..." autocomplete="off" disabled>
+            <button class="btn execute-blink" id="guess-btn" disabled>Execute</button>
+        </div>
+        <div class="game-dashboard">
+            <div id="network-graph"></div>
+            <div id="game-results"></div>
+        </div>
+
+        <button class="btn btn-safe" id="safe-btn" disabled>OVERRIDE: INJECT SAFE DECRYPTION KEY</button>
+    </section>
+</div>
+<script type="module">
+    import { pipeline, env } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2';
+    env.allowLocalModels = false;
+    let extractor = null;
+    let targetTensor = null;
+
+    // encoded feel free to reverse engineer it if you want to spend time not playing my game u little rogue
+    const encodedDictionary = [
+        "YXV0b21hdGlvbg==", "Y3liZXJuZXRpY3M=", "aW50ZWxsaWdlbmNl", "bmV1cmFs", "dGVuc29y", 
+        "YWxnb3JpdGht", "c3luYXBzZQ==", "aGV1cmlzdGlj", "b3B0aW1pemF0aW9u", "Z3JhZGllbnQ=", 
+        "bWFjaGluZQ==", "bGVhcm5pbmc=", "YXJjaGl0ZWN0dXJl", "bWljcm9zZXJ2aWNl", "dHJhZGluZw==",
+        "a2luZw==", "cXVlZW4=", "Y2F0", "ZG9n", "b2NlYW4=", "d2F0ZXI=", 
+        "Y29mZmVl", "dGVh", "Y2xvdWQ=", "ZGF0YWJhc2U=", "bGF0ZW5jeQ==", 
+        "cHJvdG9jb2w=", "ZmlyZQ==", "aWNl", "YXBwbGU=", "ZnJ1aXQ="
+    ];
+    const dictionary = encodedDictionary.map(s => atob(s));
+
+    const now = new Date();
+    const dayOfYear = Math.floor((now - new Date(now.getFullYear(), 0, 0)) / (1000 * 60 * 60 * 24));
+    const dailyTargetWord = dictionary[dayOfYear % dictionary.length];
+    
+    const nodes = new vis.DataSet([
+        { id: 'TARGET', label: '[ ??? ]', shape: 'hexagon', color: { background: '#111', border: '#ff003c' }, font: { color: '#ff003c', face: 'Courier New', size: 20 }, size: 30 }
+    ]);
+    const edges = new vis.DataSet([]);
+    const container = document.getElementById('network-graph');
+    const networkData = { nodes: nodes, edges: edges };
+    const networkOptions = {
+        physics: {
+            forceAtlas2Based: { gravitationalConstant: -50, centralGravity: 0.01, springConstant: 0.08 },
+            minVelocity: 0.75,
+            solver: 'forceAtlas2Based'
+        },
+        nodes: {
+            borderWidth: 2,
+            font: { face: 'Courier New', color: '#00ff41' },
+            color: { background: '#050505', border: '#2d7337', highlight: { background: '#050505', border: '#00ff41' } }
+        },
+        edges: { width: 1, smooth: { type: 'continuous' } },
+        interaction: { zoomView: true, dragView: true }
+    };
+    const network = new vis.Network(container, networkData, networkOptions);
+    network.moveTo({ scale: 0.5 });
+    function cosineSimilarity(vecA, vecB) {
+        let dotProduct = 0.0, normA = 0.0, normB = 0.0;
+        for (let i = 0; i < vecA.length; i++) {
+            dotProduct += vecA[i] * vecB[i];
+            normA += vecA[i] * vecA[i];
+            normB += vecB[i] * vecB[i];
+        }
+        if (normA === 0 || normB === 0) return 0;
+        return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
+    }
+    async function initNeuralNet() {
+        try {
+            const statusEl = document.getElementById('system-status');
+            extractor = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2');
+            
+            const targetOutput = await extractor(dailyTargetWord, { pooling: 'mean', normalize: true });
+            targetTensor = targetOutput.data; 
+            
+            statusEl.innerText = '[SYS] Neural Link Established. Daily target embedded in latent space.';
+            statusEl.style.color = 'var(--main-neon)';
+            
+            document.getElementById('guess-input').disabled = false;
+            document.getElementById('guess-btn').disabled = false;
+            document.getElementById('safe-btn').disabled = false;
+            
+        } catch (err) {
+            console.error(err);
+            document.getElementById('system-status').innerText = '[SYS] ERROR: Failed to load ONNX weights. Check console.';
+            document.getElementById('system-status').style.color = 'var(--alert-neon)';
+        }
+    }
+    async function processGuess() {
+        const input = document.getElementById('guess-input');
+        const guess = input.value.trim().toLowerCase();
+        
+        if (!guess || !extractor || nodes.get(guess)) {
+            input.value = ''; return; // Prevent empty or duplicate guesses
+        }
+        input.disabled = true;
+        try {
+            const guessOutput = await extractor(guess, { pooling: 'mean', normalize: true });
+            const guessTensor = guessOutput.data;
+            
+            const rawSimilarity = cosineSimilarity(targetTensor, guessTensor);
+            const score = Math.max(0, rawSimilarity) * 100;
+            
+            renderResult(guess, score);
+            updateGraph(guess, score);
+            
+            if (score > 99) triggerWin();
+        } catch (err) {
+            console.error(err);
+        } finally {
+            input.value = '';
+            input.disabled = false;
+            input.focus();
+        }
+    }
+    function updateGraph(guess, score) {
+        let hslColor = `hsl(${score * 1.2}, 100%, 50%)`;
+        if (score > 99) hslColor = '#ffffff';
+        nodes.add({
+            id: guess,
+            label: guess.toUpperCase(),
+            color: { background: '#050505', border: hslColor },
+            font: { color: hslColor }
+        });
+        const springLen = 400 - (score * 3.5); 
+        edges.add({
+            from: guess,
+            to: 'TARGET',
+            color: { color: hslColor, opacity: 0.6 },
+            length: Math.max(50, springLen),
+            label: `${score.toFixed(1)}%`,
+            font: { align: 'middle', size: 10, color: hslColor, strokeWidth: 0 }
+        });
+    }
+    function renderResult(guess, score) {
+        const resultsContainer = document.getElementById('game-results');
+        let barColor = `hsl(${score * 1.2}, 100%, 50%)`;
+        if (score > 99) barColor = '#ffffff';
+
+        const row = document.createElement('div');
+        row.className = 'guess-row';
+        row.innerHTML = `
+            <div class="guess-word">${guess.toUpperCase()}</div>
+            <div class="progress-bar-container">
+                <div class="progress-bar" style="width: 0%; background: ${barColor};"></div>
+            </div>
+            <div class="guess-score">${score.toFixed(1)}%</div>
+        `;
+        resultsContainer.insertBefore(row, resultsContainer.firstChild);
+        setTimeout(() => { row.querySelector('.progress-bar').style.width = `${score}%`; }, 50);
+    }
+    function triggerWin() {
+        document.getElementById('system-status').innerText = '[SYS] TARGET ACQUIRED. BREACH SUCCESSFUL.';
+        document.getElementById('system-status').style.color = '#ffffff';
+        document.getElementById('guess-input').disabled = true;
+        document.getElementById('guess-btn').disabled = true;
+        document.getElementById('guess-btn').classList.remove('execute-blink');
+        document.getElementById('safe-btn').style.display = 'none';
+        nodes.update({
+            id: 'TARGET',
+            label: dailyTargetWord.toUpperCase(),
+            color: { background: '#ffffff', border: '#ffffff' },
+            font: { color: '#000000', face: 'Courier New', size: 24, bold: true },
+            shape: 'star'
+        });
+    }
+    document.getElementById('jump-to-minigame').addEventListener('click', function() {
+        this.classList.remove('blink-prompt');
+    });
+    document.getElementById('guess-input').addEventListener('focus', function() {
+        document.getElementById('minigame').classList.remove('attention-pulse');
+    });
+
+    document.getElementById('guess-btn').addEventListener('click', () => {
+        document.getElementById('minigame').classList.remove('attention-pulse');
+        processGuess();
+    });
+    
+    document.getElementById('guess-input').addEventListener('keypress', function(event) {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            processGuess();
+        }
+    });
+
+    document.getElementById('safe-btn').addEventListener('click', function() {
+        document.getElementById('minigame').classList.remove('attention-pulse');
+        renderResult(dailyTargetWord, 100);
+        triggerWin();
+    });
+
+    initNeuralNet();
+</script>
+
+</body>
+</html>

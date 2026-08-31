@@ -397,6 +397,7 @@
 
         const row = document.createElement('div');
         row.className = 'guess-row';
+        row.dataset.score = score; // store score for sorting
         row.innerHTML = `
             <div class="guess-word">${guess.toUpperCase()}</div>
             <div class="progress-bar-container">
@@ -404,7 +405,14 @@
             </div>
             <div class="guess-score">${score.toFixed(1)}%</div>
         `;
-        resultsContainer.insertBefore(row, resultsContainer.firstChild);
+
+        const rows = Array.from(resultsContainer.getElementsByClassName('guess-row'));
+        rows.push(row);
+        rows.sort((a, b) => parseFloat(b.dataset.score) - parseFloat(a.dataset.score));
+        
+        resultsContainer.innerHTML = '';
+        rows.forEach(r => resultsContainer.appendChild(r));
+
         setTimeout(() => { row.querySelector('.progress-bar').style.width = `${score}%`; }, 50);
     }
     function triggerWin() {

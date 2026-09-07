@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Oldřich Kaucký | ML & Automation</title>
-    <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+    <script type="text/javascript" src="https://unpkg.com/vis-network@9.1.9/standalone/umd/vis-network.min.js"></script>
     <style>
         :root {
             --bg-color: #050505;
@@ -226,7 +226,10 @@
         </div>
     </section>
     <section class="section attention-pulse" id="minigame">
-        <h2>>> NEURAL_LINK_BREACH (Semantic Guesser) using *all-MiniLM-L6-v2</h2>
+        <h2>>> Games and fun</h2>
+        <div id="minigame-selector" role="tablist" aria-label="Available minigames" style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 1rem;"></div>
+        <div id="minigame-host">
+        <div id="semantic-guesser-game">
         <p>Target locked. A daily target word is hidden in the latent space. Show me your skills, Sherlock.</p>
         <div id="system-status">[SYS] Initializing... </div>
 
@@ -240,281 +243,1967 @@
             <div id="game-results"></div>
         </div>
 
-        <div class="lb-container">
-            <h3>>> GLOBAL_TELEMETRY_FEED</h3>
-            <div id="leaderboard-results">[SYS] Connecting to live global nodes...</div>
-        </div>
-
         <button class="btn btn-safe" id="safe-btn" disabled>OVERRIDE: INJECT SAFE DECRYPTION KEY</button>
+        </div>
+        <div id="stochastic-navigator-game" hidden>
+            <p>Probe trajectory initialized. Place policy vectors and navigate the turbulence field.</p>
+            <div id="navigator-status" style="color: #ffaa00; margin-bottom: 15px; font-weight: bold;">[SYS] Navigator paused.</div>
+            <canvas id="navigator-grid" style="width: 100%; height: 340px; background: #0a0a0a; border: 1px solid var(--text-muted);"></canvas>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px;">
+                <button class="btn" id="navigator-solve">SOLVE POLICY</button>
+                <button class="btn" id="navigator-step">STEP PROBE</button>
+                <button class="btn" id="navigator-run">RUN PROBE</button>
+                <button class="btn" id="navigator-reset">RESET GRID</button>
+            </div>
+            <div id="navigator-dashboard" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 15px;">
+                <div>STATE <strong id="navigator-state">0,0</strong></div>
+                <div>VALUE <strong id="navigator-value">0.00</strong></div>
+                <div>STEPS <strong id="navigator-steps">0</strong></div>
+                <div>CONVERGENCE <strong id="navigator-convergence">0.000</strong></div>
+                <div>REWARD <strong id="navigator-reward">0.00</strong></div>
+                <div>WIND <strong id="navigator-wind">0%</strong></div>
+            </div>
+            <div id="navigator-telemetry" style="margin-top: 15px; max-height: 110px; overflow-y: auto; color: var(--text-muted);"></div>
+        </div>
+        <div id="algo-trader-game" hidden>
+            <p>Jump-diffusion market online. Trade the noise, manage the risk.</p>
+            <div id="algo-trader-status" style="color: #ffaa00; margin-bottom: 15px; font-weight: bold;">[SYS] Market paused.</div>
+            <canvas id="algo-trader-chart" style="width: 100%; height: 260px; background: #0a0a0a; border: 1px solid var(--text-muted);"></canvas>
+            <div id="algo-trader-dashboard" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px;">
+                <div>PRICE <strong id="algo-price">100.00</strong></div>
+                <div>EQUITY <strong id="algo-equity">10000.00</strong></div>
+                <div>SHARPE <strong id="algo-sharpe">0.00</strong></div>
+                <div>POSITION <strong id="algo-position">FLAT</strong></div>
+                <div>PNL <strong id="algo-pnl">0.00</strong></div>
+                <div>DRAWDOWN <strong id="algo-drawdown">0.00%</strong></div>
+            </div>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px;">
+                <button class="btn" id="algo-buy">BUY</button>
+                <button class="btn" id="algo-sell">SELL</button>
+                <button class="btn" id="algo-close">CLOSE</button>
+                <label>STOP <input class="terminal-input" id="algo-stop" type="number" min="1" max="50" step="0.5" value="5" style="width: 80px;"></label>
+            </div>
+            <div id="algo-order-book" style="margin-top: 15px; max-height: 120px; overflow-y: auto; color: var(--text-muted);"></div>
+        </div>
+        <div id="quantum-craps-game" hidden>
+            <p>Virtual capital allocation online. Price the odds before the house prices you.</p>
+            <div id="craps-status" style="color: #ffaa00; margin-bottom: 15px; font-weight: bold;">[SYS] Casino paused.</div>
+            <canvas id="craps-chart" style="width: 100%; height: 260px; background: #0a0a0a; border: 1px solid var(--text-muted);"></canvas>
+            <div id="craps-dashboard" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px;">
+                <div>BANKROLL <strong id="craps-bankroll">1000.00</strong></div>
+                <div>EV <strong id="craps-ev">0.00</strong></div>
+                <div>VARIANCE <strong id="craps-variance">0.00</strong></div>
+                <div>HOUSE EDGE <strong id="craps-edge">0.00%</strong></div>
+                <div>KELLY <strong id="craps-kelly">0.00%</strong></div>
+                <div>RISK OF RUIN <strong id="craps-risk">0.00%</strong></div>
+                <div>DRAWDOWN <strong id="craps-drawdown">0.00%</strong></div>
+                <div>ROUND <strong id="craps-round">0</strong></div>
+                <div>OUTCOME <strong id="craps-outcome">---</strong></div>
+            </div>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px;">
+                <button class="btn" data-craps-outcome="red">BET RED</button>
+                <button class="btn" data-craps-outcome="blue">BET BLUE</button>
+                <button class="btn" data-craps-outcome="green">BET GREEN</button>
+                <label>STAKE <input class="terminal-input" id="craps-stake" type="number" min="1" max="1000" step="1" value="25" style="width: 90px;"></label>
+                <button class="btn" id="craps-kelly-bet">KELLY BET</button>
+                <button class="btn" id="craps-reset">RESET BANKROLL</button>
+            </div>
+            <div id="craps-log" style="margin-top: 15px; max-height: 120px; overflow-y: auto; color: var(--text-muted);"></div>
+        </div>
+        <div id="pid-stabilizer-game" hidden>
+            <p>Closed-loop control online. Tune the controller and hold the pole against stochastic wind.</p>
+            <div id="pid-status" style="color: #ffaa00; margin-bottom: 15px; font-weight: bold;">[SYS] Stabilizer paused.</div>
+            <canvas id="pid-canvas" style="width: 100%; height: 360px; background: #0a0a0a; border: 1px solid var(--text-muted);"></canvas>
+            <div id="pid-dashboard" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px;">
+                <div>ANGLE <strong id="pid-angle">0.00°</strong></div>
+                <div>ANGULAR RATE <strong id="pid-rate">0.00</strong></div>
+                <div>ERROR <strong id="pid-error">0.00</strong></div>
+                <div>CONTROL <strong id="pid-control">0.00</strong></div>
+                <div>SURVIVAL <strong id="pid-survival">0.0s</strong></div>
+                <div>STABILITY <strong id="pid-stability">100.0%</strong></div>
+                <div>STABLE TIMER <strong id="pid-stable-timer">0.0 / 10.0s</strong></div>
+                <div>PENDULUM DOTS <strong id="pid-dot-count">1 / 3</strong></div>
+            </div>
+            <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-top: 15px;">
+                <label title="Proportional: pushes harder when the pole is leaning.">Kp / SNAP BACK <input id="pid-kp" type="range" min="0" max="40" step="0.1" value="14"></label>
+                <label title="Integral: removes a persistent small lean. Keep this low to avoid wobble.">Ki / TRIM DRIFT <input id="pid-ki" type="range" min="0" max="10" step="0.05" value="0.35"></label>
+                <label title="Derivative: brakes the pole when it is moving quickly.">Kd / BRAKE <input id="pid-kd" type="range" min="0" max="15" step="0.1" value="6"></label>
+                <button class="btn" id="pid-reset">RESET POLE</button>
+                <button class="btn" id="pid-shock-left">WIND LEFT &lt;&lt;</button>
+                <button class="btn" id="pid-shock-right">WIND RIGHT &gt;&gt;</button>
+            </div>
+            <div style="margin-top: 10px; color: var(--text-muted);">START HERE: raise Kp to catch a lean, raise Kd to calm oscillation, and use only a little Ki to correct a persistent offset. Hold every active dot inside the green cone for 10 seconds to add the next segment.</div>
+            <div id="pid-gains" style="margin-top: 10px; color: var(--text-muted);">Kp=14.0 | Ki=0.35 | Kd=6.0</div>
+        </div>
+        <div id="dungeon-automata-game" hidden>
+            <p>Deterministic dungeon crawler online. Assemble a party, survive the rooms, and let the automata handle combat.</p>
+            <div id="dungeon-status" style="color: #ffaa00; margin-bottom: 10px; font-weight: bold;">[SYS] Party selection required.</div>
+            <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:end; margin-bottom:12px;">
+                <label>PARTY (duplicates allowed)
+                    <select class="terminal-input" id="dungeon-role-1"><option>Warrior</option><option>Mage</option><option>Rogue</option><option>Hunter</option><option>Priest</option></select>
+                </label>
+                <label><span aria-hidden="true">&nbsp;</span>
+                    <select class="terminal-input" id="dungeon-role-2"><option>Warrior</option><option>Mage</option><option>Rogue</option><option>Hunter</option><option>Priest</option></select>
+                </label>
+                <label><span aria-hidden="true">&nbsp;</span>
+                    <select class="terminal-input" id="dungeon-role-3"><option>Warrior</option><option>Mage</option><option>Rogue</option><option>Hunter</option><option>Priest</option></select>
+                </label>
+                <button class="btn" id="dungeon-new">START RUN</button>
+            </div>
+            <canvas id="dungeon-canvas" style="width:100%; height:360px; background:#070707; border:1px solid var(--text-muted); touch-action:none;"></canvas>
+            <div id="dungeon-dashboard" style="display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-top:10px;">
+                <div>ROOM <strong id="dungeon-room">1</strong></div><div>PARTY HP <strong id="dungeon-hp">100%</strong></div>
+                <div>ENEMIES <strong id="dungeon-enemies">0</strong></div><div>SEED <strong id="dungeon-seed">DUNGEON-1</strong></div>
+            </div>
+            <div id="dungeon-buffs" style="display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;"></div>
+            <div style="margin-top:10px; color:var(--text-muted);">MOVE: WASD / ARROWS. On touch screens, drag the virtual stick. Combat is autonomous.</div>
+            <div id="dungeon-joystick" aria-label="Virtual movement joystick" style="width:110px;height:110px;border:1px solid var(--text-muted);border-radius:50%;margin:12px auto 0;position:relative;touch-action:none;">
+                <div id="dungeon-stick" style="width:38px;height:38px;border-radius:50%;background:var(--main-neon);position:absolute;left:35px;top:35px;opacity:.8;"></div>
+            </div>
+        </div>
     </section>
+    <div class="lb-container" id="arcade-leaderboard">
+        <h3 id="leaderboard-title">>> GLOBAL_TELEMETRY_FEED</h3>
+        <div id="leaderboard-results">[SYS] Connecting to live global nodes...</div>
+    </div>
 </div>
 
 <script type="module">
     import { pipeline, env } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2';
     env.allowLocalModels = false;
-    let extractor = null;
-    let targetTensor = null;
 
-    const WORKER_API_URL = "https://cv-leaderboard-api.kaucjak.workers.dev";
-//you sneaky rogue, do not cheat i see you (proper hashing deserved..if you want to ask)
-const techDictionary = [
-        "algorithm", "analytics", "asynchronous", "automation", "backend", 
-        "bandwidth", "binary", "botnet", "bottleneck", "bytecode", "cluster", 
-        "compiler", "compute", "container", "daemon", "database", "debugging", 
-        "deploy", "distributed", "docker", "domain", "encryption", "ethernet", 
-        "firewall", "firmware", "framework", "gateway", "gradient", "hardware", 
-        "hash", "heuristic", "hypervisor", "index", "inheritance", "injection", 
-        "instance", "interface", "interpreter", "iteration", "javascript", 
-        "json", "kernel", "kubernetes", "latency", "library", "loadbalancer", 
-        "logging", "malware", "memory", "microservice", "middleware", "monolith", 
-        "multithreading", "namespace", "network", "node", "object", "optimization", 
-        "packet", "patch", "payload", "pipeline", "pointer", "polymorphism", 
-        "process", "protocol", "query", "queue", "quantum", "recursion", 
-        "refactor", "repository", "request", "resource", "response", "restapi", 
-        "router", "runtime", "scalability", "scalar", "sandbox", "script", 
-        "segmentation", "server", "session", "shell", "snippet", "socket", 
-        "source", "stack", "state", "static", "stream", "string", "subroutine", 
-        "synapse", "syntax", "telemetry", "tensor", "thread", "token", 
-        "transaction", "tunnel", "unicode", "utility", "variable", "vector", 
-        "virtual", "virtualization", "vulnerability", "websocket", "widget", "workflow"
-    ];
+   const WORKER_API_URL = "https://cv-leaderboard-api.kaucjak.workers.dev";
+   const ARCADE_GAMES = {
+       "semantic-guesser": { label: "SEMANTIC_GUESSER", scoreLabel: "guesses", lowerIsBetter: true },
+       "algo-trader-1987": { label: "ALGO_TRADER_1987", scoreLabel: "Sharpe" },
+       "stochastic-navigator": { label: "STOCHASTIC_NAVIGATOR", scoreLabel: "efficiency" },
+       "quantum-craps": { label: "QUANTUM_CRAPS", scoreLabel: "bankroll" },
+       "pid-stabilizer": { label: "PID_STABILIZER", scoreLabel: "survival seconds" },
+       "dungeon-automata": { label: "DUNGEON_AUTOMATA", scoreLabel: "level score" }
+   };
+   const ArcadeLeaderboard = (() => {
+       const controllers = new Map();
+       const requestVersions = new Map();
+       const user = (() => {
+           try {
+               const key = "arcade-anonymous-name";
+               const existing = sessionStorage.getItem(key);
+               if (existing) return existing;
+               const generated = `agent_${Math.floor(1000 + Math.random() * 9000)}`;
+               sessionStorage.setItem(key, generated);
+               return generated;
+           } catch (_) {
+               return `agent_${Math.floor(1000 + Math.random() * 9000)}`;
+           }
+       })();
+       function validate(gameId) {
+           if (!Object.prototype.hasOwnProperty.call(ARCADE_GAMES, gameId)) throw new Error("Unknown arcade game.");
+       }
+       function request(gameId, options = {}) {
+           validate(gameId);
+           if (controllers.has(gameId)) controllers.get(gameId).abort();
+           const controller = new AbortController();
+           controllers.set(gameId, controller);
+           const version = (requestVersions.get(gameId) || 0) + 1;
+           requestVersions.set(gameId, version);
+           return { controller, version, signal: options.signal || controller.signal };
+       }
+       async function get(gameId, signal) {
+           const requestState = request(gameId, { signal });
+           const url = gameId === "semantic-guesser"
+               ? WORKER_API_URL
+               : `${WORKER_API_URL}/v2/leaderboard?gameId=${encodeURIComponent(gameId)}`;
+           const response = await fetch(url, { signal: requestState.signal });
+           if (!response.ok) throw new Error(`Leaderboard request failed (${response.status}).`);
+           const body = await response.json();
+           if (requestVersions.get(gameId) !== requestState.version) return null;
+           return gameId === "semantic-guesser"
+               ? {
+                   gameId,
+                   entries: (Array.isArray(body) ? body : []).map(entry => ({
+                       ...entry,
+                       score: Number(entry.guesses),
+                       scoreLabel: "guesses"
+                   }))
+               }
+               : body;
+       }
+       async function submit(payload, signal) {
+           validate(payload.gameId);
+           const gameId = payload.gameId;
+           const requestState = request(gameId, { signal });
+           const body = gameId === "semantic-guesser"
+               ? { user: payload.user || user, guesses: payload.score }
+               : { ...payload, user: payload.user || user, submissionId: payload.submissionId || (crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`) };
+           const response = await fetch(gameId === "semantic-guesser" ? WORKER_API_URL : `${WORKER_API_URL}/v2/leaderboard?gameId=${encodeURIComponent(gameId)}`, {
+               method: "POST", headers: { "Content-Type": "application/json" },
+               body: JSON.stringify(body), signal: requestState.signal
+           });
+           if (!response.ok) throw new Error(`Score submission failed (${response.status}).`);
+           return response.json();
+       }
+       async function telemetry(gameId, payload, signal) {
+           validate(gameId);
+           const requestState = request(gameId, { signal });
+           const response = await fetch(`${WORKER_API_URL}/v2/telemetry?gameId=${encodeURIComponent(gameId)}`, {
+               method: "POST", headers: { "Content-Type": "application/json" },
+               body: JSON.stringify({ ...payload, gameId, user, submissionId: payload.submissionId || (crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`) }),
+               signal: requestState.signal
+           });
+           if (!response.ok) throw new Error(`Telemetry request failed (${response.status}).`);
+           return response.json();
+       }
+       function cancel(gameId) {
+           if (controllers.has(gameId)) controllers.get(gameId).abort();
+       }
+       return { get, submit, telemetry, cancel, user };
+   })();
+   const arcadeRunIds = new Map();
+   function arcadeRunId(gameId) {
+       if (!arcadeRunIds.has(gameId)) arcadeRunIds.set(gameId, `${gameId}-${Date.now()}-${Math.random().toString(16).slice(2)}`);
+       return arcadeRunIds.get(gameId);
+   }
+   function submitArcadeScore(gameId, score, scoreLabel, metrics = {}) {
+       if (!Number.isFinite(Number(score))) return;
+       ArcadeLeaderboard.submit({ gameId, score: Number(score), scoreLabel, metrics, submissionId: arcadeRunId(gameId) }).catch(error => {
+           if (error.name !== "AbortError") console.warn("[ARCADE] score submission unavailable", error);
+       });
+   }
+   function renderArcadeLeaderboard(gameId, token) {
+       const container = document.getElementById("leaderboard-results");
+       const title = document.getElementById("leaderboard-title");
+       const config = ARCADE_GAMES[gameId];
+       if (!container || !config) return;
+       title.textContent = `>> GLOBAL BOARD: ${config.label}`;
+       container.textContent = "[SYS] Syncing daily board...";
+       ArcadeLeaderboard.get(gameId).then(board => {
+           if (!board || managerLifecycle !== token) return;
+           const entries = Array.isArray(board.entries) ? board.entries : [];
+           container.innerHTML = "";
+           if (!entries.length) {
+               container.textContent = "// No scores recorded for today. Be the first agent to breach!";
+               return;
+           }
+           const best = entries[0].score;
+           entries.forEach((entry, index) => {
+               const row = document.createElement("div");
+               row.className = "lb-row";
+               const name = document.createElement("div");
+               name.className = "lb-name";
+               name.textContent = `#${index + 1} ${entry.user || "anonymous"}`;
+               const bar = document.createElement("div");
+               bar.className = "progress-bar-container";
+               const fill = document.createElement("div");
+               fill.className = "progress-bar";
+               const ratio = config.lowerIsBetter ? best / Math.max(entry.score, 0.0001) : entry.score / Math.max(best, 0.0001);
+               fill.style.width = `${Math.max(15, Math.min(100, ratio * 100))}%`;
+               bar.appendChild(fill);
+               const score = document.createElement("div");
+               score.className = "lb-score";
+               score.textContent = `${entry.score} ${entry.scoreLabel || config.scoreLabel}`;
+               row.append(name, bar, score);
+               container.appendChild(row);
+           });
+       }).catch(error => {
+           if (error.name !== "AbortError" && managerLifecycle === token) container.textContent = "// Daily board unavailable.";
+       });
+   }
+   let managerLifecycle = 0;
+   const techDictionary = [
+       "algorithm", "analytics", "asynchronous", "automation", "backend", "bandwidth", "binary", "botnet", "bottleneck", "bytecode", "cluster",
+       "compiler", "compute", "container", "daemon", "database", "debugging", "deploy", "distributed", "docker", "domain", "encryption", "ethernet",
+       "firewall", "firmware", "framework", "gateway", "gradient", "hardware", "hash", "heuristic", "hypervisor", "index", "inheritance", "injection",
+       "instance", "interface", "interpreter", "iteration", "javascript", "json", "kernel", "kubernetes", "latency", "library", "loadbalancer",
+       "logging", "malware", "memory", "microservice", "middleware", "monolith", "multithreading", "namespace", "network", "node", "object", "optimization",
+       "packet", "patch", "payload", "pipeline", "pointer", "polymorphism", "process", "protocol", "query", "queue", "quantum", "recursion",
+       "refactor", "repository", "request", "resource", "response", "restapi", "router", "runtime", "scalability", "scalar", "sandbox", "script",
+       "segmentation", "server", "session", "shell", "snippet", "socket", "source", "stack", "state", "static", "stream", "string", "subroutine",
+       "synapse", "syntax", "telemetry", "tensor", "thread", "token", "transaction", "tunnel", "unicode", "utility", "variable", "vector",
+       "virtual", "virtualization", "vulnerability", "websocket", "widget", "workflow"
+   ];
 
-    const now = new Date();
-    const startOfYear = new Date(now.getFullYear(), 0, 1);
-    const dayOfYear = Math.floor((now - startOfYear) / (1000 * 60 * 60 * 24));
-    const dailyTargetWord = techDictionary[dayOfYear % techDictionary.length];
-    
-    const visitorName = `agent_${Math.floor(1000 + Math.random() * 9000)}`;
+   function createSemanticGuesser(root) {
+       const now = new Date();
+       const startOfYear = new Date(now.getFullYear(), 0, 1);
+       const dayOfYear = Math.floor((now - startOfYear) / (1000 * 60 * 60 * 24));
+       const dailyTargetWord = techDictionary[dayOfYear % techDictionary.length];
+       const visitorName = `agent_${Math.floor(1000 + Math.random() * 9000)}`;
+       const statusEl = root.querySelector('#system-status');
+       const input = root.querySelector('#guess-input');
+       const guessButton = root.querySelector('#guess-btn');
+       const safeButton = root.querySelector('#safe-btn');
+       const resultsContainer = root.querySelector('#game-results');
+       const leaderboardContainer = document.getElementById('leaderboard-results');
+       const nodes = new vis.DataSet([
+           { id: 'TARGET', label: '[ ??? ]', shape: 'hexagon', color: { background: '#111', border: '#ff003c' }, font: { color: '#ff003c', face: 'Courier New', size: 20 }, size: 30 }
+       ]);
+       const edges = new vis.DataSet([]);
+       const network = new vis.Network(root.querySelector('#network-graph'), { nodes, edges }, {
+           physics: {
+               forceAtlas2Based: { gravitationalConstant: -50, centralGravity: 0.01, springConstant: 0.08 },
+               minVelocity: 0.75,
+               solver: 'forceAtlas2Based'
+           },
+           nodes: {
+               borderWidth: 2,
+               font: { face: 'Courier New', color: '#00ff41' },
+               color: { background: '#050505', border: '#2d7337', highlight: { background: '#050505', border: '#00ff41' } }
+           },
+           edges: { width: 1, smooth: { type: 'continuous' } },
+           interaction: { zoomView: true, dragView: true }
+       });
+       network.moveTo({ scale: 0.5 });
 
-    const nodes = new vis.DataSet([
-        { id: 'TARGET', label: '[ ??? ]', shape: 'hexagon', color: { background: '#111', border: '#ff003c' }, font: { color: '#ff003c', face: 'Courier New', size: 20 }, size: 30 }
-    ]);
-    const edges = new vis.DataSet([]);
-    const container = document.getElementById('network-graph');
-    const networkData = { nodes: nodes, edges: edges };
-    const networkOptions = {
-        physics: {
-            forceAtlas2Based: { gravitationalConstant: -50, centralGravity: 0.01, springConstant: 0.08 },
-            minVelocity: 0.75,
-            solver: 'forceAtlas2Based'
-        },
-        nodes: {
-            borderWidth: 2,
-            font: { face: 'Courier New', color: '#00ff41' },
-            color: { background: '#050505', border: '#2d7337', highlight: { background: '#050505', border: '#00ff41' } }
-        },
-        edges: { width: 1, smooth: { type: 'continuous' } },
-        interaction: { zoomView: true, dragView: true }
-    };
-    const network = new vis.Network(container, networkData, networkOptions);
-    network.moveTo({ scale: 0.5 });
+       let extractor = null;
+       let targetTensor = null;
+       let guessCount = 0;
+       let won = false;
+       let active = false;
+       let destroyed = false;
+       let lifecycle = 0;
+       let abortController = new AbortController();
+       const timers = new Set();
 
-    function cosineSimilarity(vecA, vecB) {
-        let dotProduct = 0.0, normA = 0.0, normB = 0.0;
-        for (let i = 0; i < vecA.length; i++) {
-            dotProduct += vecA[i] * vecB[i];
-            normA += vecA[i] * vecA[i];
-            normB += vecB[i] * vecB[i];
+       function isCurrent(token) {
+           return active && !destroyed && token === lifecycle;
+       }
+
+       function cosineSimilarity(vecA, vecB) {
+           let dotProduct = 0.0, normA = 0.0, normB = 0.0;
+           for (let i = 0; i < vecA.length; i++) {
+               dotProduct += vecA[i] * vecB[i];
+               normA += vecA[i] * vecA[i];
+               normB += vecB[i] * vecB[i];
+           }
+           if (normA === 0 || normB === 0) return 0;
+           return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
+       }
+
+       async function fetchGlobalLeaderboard(token) {
+           if (!isCurrent(token)) return;
+           try {
+               const board = await ArcadeLeaderboard.get('semantic-guesser', abortController.signal);
+               if (!isCurrent(token) || !board) return;
+               const entries = (board.entries || []).map(entry => ({
+                   ...entry, score: entry.guesses, scoreLabel: 'guesses'
+               }));
+               renderArcadeLeaderboard('semantic-guesser', managerLifecycle);
+           } catch (err) {
+               if (err.name !== 'AbortError') leaderboardContainer.textContent = '// Failed to sync global telemetry stream.';
+           }
+       }
+
+       async function submitGlobalScore(guessesCount, token) {
+           try {
+               await ArcadeLeaderboard.submit({ gameId: 'semantic-guesser', user: visitorName, score: guessesCount, submissionId: arcadeRunId('semantic-guesser') }, abortController.signal);
+               if (isCurrent(token)) fetchGlobalLeaderboard(token);
+           } catch (err) {
+               if (err.name !== 'AbortError') console.error("Global score push failed:", err);
+           }
+       }
+
+       function updateControls() {
+           input.disabled = !extractor || !targetTensor || won || !active;
+           guessButton.disabled = input.disabled;
+           safeButton.disabled = input.disabled;
+           if (won) {
+               guessButton.classList.remove('execute-blink');
+               safeButton.style.display = 'none';
+           } else {
+               safeButton.style.display = '';
+           }
+       }
+
+       function triggerWin() {
+           won = true;
+           statusEl.innerText = '[SYS] TARGET ACQUIRED. GLOBAL TELEMETRY UPDATED.';
+           statusEl.style.color = '#ffffff';
+           nodes.update({
+               id: 'TARGET',
+               label: dailyTargetWord.toUpperCase(),
+               color: { background: '#ffffff', border: '#ffffff' },
+               font: { color: '#000000', face: 'Courier New', size: 24, bold: true },
+               shape: 'star'
+           });
+           updateControls();
         }
-        if (normA === 0 || normB === 0) return 0;
-        return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
-    }
-async function fetchGlobalLeaderboard() {
-        const lbContainer = document.getElementById('leaderboard-results');
-        try {
-            const res = await fetch(WORKER_API_URL);
-            const scores = await res.json();
-            
-            if (!scores || scores.length === 0) {
-                lbContainer.innerHTML = `<div style="color:var(--text-muted)">// No telemetry logs recorded for today. Be the first agent to breach!</div>`;
-                return;
-            }
 
-            const minGuesses = Math.min(...scores.map(e => e.guesses));
-
-            lbContainer.innerHTML = '';
-            scores.forEach((entry, index) => {
-                const row = document.createElement('div');
-                row.className = 'lb-row';
-                
-                const nameDiv = document.createElement('div');
-                nameDiv.className = 'lb-name';
-                nameDiv.textContent = `#${index + 1} ${entry.user}`;
-
-                // Calculate relative bar width (fewest guesses gets 100%, others scale down)
-                const barWidth = Math.max(15, Math.min(100, (minGuesses / entry.guesses) * 100));
-
-                const barContainer = document.createElement('div');
-                barContainer.className = 'progress-bar-container';
-                barContainer.innerHTML = `<div class="progress-bar" style="width: ${barWidth}%;"></div>`;
-
-                const scoreDiv = document.createElement('div');
-                scoreDiv.className = 'lb-score';
-                scoreDiv.textContent = `${entry.guesses} guesses`;
-
-                row.appendChild(nameDiv);
-                row.appendChild(barContainer);
-                row.appendChild(scoreDiv);
-                lbContainer.appendChild(row);
-            });
-        } catch (err) {
-            lbContainer.innerHTML = `<div style="color:var(--alert-neon)">// Failed to sync global telemetry stream.</div>`;
+       function updateGraph(guess, score) {
+           const hslColor = score > 99 ? '#ffffff' : `hsl(${score * 1.2}, 100%, 50%)`;
+           nodes.add({ id: guess, label: guess.toUpperCase(), color: { background: '#050505', border: hslColor }, font: { color: hslColor } });
+           edges.add({
+               from: guess, to: 'TARGET', color: { color: hslColor, opacity: 0.6 },
+               length: Math.max(50, 400 - (score * 3.5)), label: `${score.toFixed(1)}%`,
+               font: { align: 'middle', size: 10, color: hslColor, strokeWidth: 0 }
+           });
         }
-    }
-    async function submitGlobalScore(guessesCount) {
-        try {
-            await fetch(WORKER_API_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ user: visitorName, guesses: guessesCount })
-            });
-            fetchGlobalLeaderboard();
-        } catch (err) {
-            console.error("Global score push failed:", err);
-        }
-    }
 
-    async function initNeuralNet() {
-        try {
-            const statusEl = document.getElementById('system-status');
-            extractor = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2');
-            
-            const targetOutput = await extractor(dailyTargetWord, { pooling: 'mean', normalize: true });
-            targetTensor = targetOutput.data; 
-            
-            statusEl.innerText = '[SYS] Initialized - Daily target embedded.';
-            statusEl.style.color = 'var(--main-neon)';
-            
-            document.getElementById('guess-input').disabled = false;
-            document.getElementById('guess-btn').disabled = false;
-            document.getElementById('safe-btn').disabled = false;
-            
-            fetchGlobalLeaderboard();
-        } catch (err) {
-            console.error(err);
-            document.getElementById('system-status').innerText = '[SYS] ERROR: Failed to load ONNX weights.';
-            document.getElementById('system-status').style.color = 'var(--alert-neon)';
-        }
-    }
+       function renderResult(guess, score) {
+           const row = document.createElement('div');
+           row.className = 'guess-row';
+           row.dataset.score = score;
+           const barColor = score > 99 ? '#ffffff' : `hsl(${score * 1.2}, 100%, 50%)`;
+           const word = document.createElement('div');
+           word.className = 'guess-word';
+           word.textContent = guess.toUpperCase();
+           const progressContainer = document.createElement('div');
+           progressContainer.className = 'progress-bar-container';
+           const progress = document.createElement('div');
+           progress.className = 'progress-bar';
+           progress.style.width = '0%';
+           progress.style.backgroundColor = barColor;
+           progressContainer.appendChild(progress);
+           const scoreLabel = document.createElement('div');
+           scoreLabel.className = 'guess-score';
+           scoreLabel.textContent = `${score.toFixed(1)}%`;
+           row.append(word, progressContainer, scoreLabel);
+           const rows = Array.from(resultsContainer.getElementsByClassName('guess-row'));
+           rows.push(row);
+           rows.sort((a, b) => parseFloat(b.dataset.score) - parseFloat(a.dataset.score));
+           resultsContainer.innerHTML = '';
+           rows.forEach(resultRow => resultsContainer.appendChild(resultRow));
+           const timer = setTimeout(() => {
+               timers.delete(timer);
+               const bar = row.querySelector('.progress-bar');
+               if (bar) bar.style.width = `${score}%`;
+           }, 50);
+           timers.add(timer);
+       }
 
-    let guessCount = 0;
-    async function processGuess() {
-        const input = document.getElementById('guess-input');
-        const guess = input.value.trim().toLowerCase();
-        
-        if (!guess || !extractor || nodes.get(guess)) {
-            input.value = ''; return;
-        }
-        guessCount++;
-        input.disabled = true;
-        try {
-            const guessOutput = await extractor(guess, { pooling: 'mean', normalize: true });
-            const guessTensor = guessOutput.data;
-            
-            const rawSimilarity = cosineSimilarity(targetTensor, guessTensor);
-            const score = Math.max(0, rawSimilarity) * 100;
-            
-            renderResult(guess, score);
-            updateGraph(guess, score);
-            
-            if (score > 99) {
-                triggerWin();
-                submitGlobalScore(guessCount);
-            }
-        } catch (err) {
-            console.error(err);
-        } finally {
-            input.value = '';
-            input.disabled = false;
-            input.focus();
-        }
-    }
+       async function processGuess() {
+           const guess = input.value.trim().toLowerCase();
+           const token = lifecycle;
+           if (!guess || !extractor || nodes.get(guess) || !isCurrent(token)) {
+               input.value = '';
+               return;
+           }
+           guessCount++;
+           input.disabled = true;
+           try {
+               const guessOutput = await extractor(guess, { pooling: 'mean', normalize: true });
+               if (!isCurrent(token)) return;
+               const score = Math.max(0, cosineSimilarity(targetTensor, guessOutput.data)) * 100;
+               renderResult(guess, score);
+               updateGraph(guess, score);
+               if (score > 99) {
+                   triggerWin();
+                   submitGlobalScore(guessCount, token);
+               }
+           } catch (err) {
+               if (err.name !== 'AbortError') console.error(err);
+           } finally {
+               input.value = '';
+               if (isCurrent(token)) {
+                   updateControls();
+                   input.focus();
+               }
+           }
+       }
 
-    function updateGraph(guess, score) {
-        let hslColor = `hsl(${score * 1.2}, 100%, 50%)`;
-        if (score > 99) hslColor = '#ffffff';
-        nodes.add({
-            id: guess,
-            label: guess.toUpperCase(),
-            color: { background: '#050505', border: hslColor },
-            font: { color: hslColor }
-        });
-        const springLen = 400 - (score * 3.5); 
-        edges.add({
-            from: guess,
-            to: 'TARGET',
-            color: { color: hslColor, opacity: 0.6 },
-            length: Math.max(50, springLen),
-            label: `${score.toFixed(1)}%`,
-            font: { align: 'middle', size: 10, color: hslColor, strokeWidth: 0 }
-        });
-    }
+       function onInputFocus() {
+           root.closest('#minigame').classList.remove('attention-pulse');
+       }
+       function onGuessClick() {
+           root.closest('#minigame').classList.remove('attention-pulse');
+           processGuess();
+       }
+       function onInputKeypress(event) {
+           if (event.key === 'Enter') {
+               event.preventDefault();
+               processGuess();
+           }
+       }
+       function onSafeClick() {
+           root.closest('#minigame').classList.remove('attention-pulse');
+           renderResult(dailyTargetWord, 100);
+           triggerWin();
+           submitGlobalScore(guessCount || 1, lifecycle);
+       }
 
-    function renderResult(guess, score) {
-        const resultsContainer = document.getElementById('game-results');
-        let barColor = `hsl(${score * 1.2}, 100%, 50%)`;
-        if (score > 99) barColor = '#ffffff';
+       async function initializeModel(token) {
+           try {
+               extractor = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2');
+               const targetOutput = await extractor(dailyTargetWord, { pooling: 'mean', normalize: true });
+               if (!isCurrent(token)) return;
+               targetTensor = targetOutput.data;
+               statusEl.innerText = '[SYS] Initialized - Daily target embedded.';
+               statusEl.style.color = 'var(--main-neon)';
+               updateControls();
+               fetchGlobalLeaderboard(token);
+           } catch (err) {
+               if (err.name !== 'AbortError' && !destroyed) {
+                   console.error(err);
+                   statusEl.innerText = '[SYS] ERROR: Failed to load ONNX weights.';
+                   statusEl.style.color = 'var(--alert-neon)';
+               }
+           }
+       }
 
-        const row = document.createElement('div');
-        row.className = 'guess-row';
-        row.dataset.score = score;
-        row.innerHTML = `
-            <div class="guess-word">${guess.toUpperCase()}</div>
-            <div class="progress-bar-container">
-                <div class="progress-bar" style="width: 0%; background: ${barColor};"></div>
-            </div>
-            <div class="guess-score">${score.toFixed(1)}%</div>
-        `;
+       return {
+           init() {
+               input.addEventListener('focus', onInputFocus);
+               guessButton.addEventListener('click', onGuessClick);
+               input.addEventListener('keypress', onInputKeypress);
+               safeButton.addEventListener('click', onSafeClick);
+           },
+           start() {
+               active = true;
+               lifecycle++;
+               abortController = new AbortController();
+               statusEl.innerText = extractor && targetTensor ? '[SYS] Initialized - Daily target embedded.' : '[SYS] Initializing...';
+               updateControls();
+               if (!extractor || !targetTensor) initializeModel(lifecycle);
+           },
+           pause() {
+               active = false;
+               lifecycle++;
+               abortController.abort();
+               input.disabled = true;
+               guessButton.disabled = true;
+               safeButton.disabled = true;
+           },
+           destroy() {
+               destroyed = true;
+               active = false;
+               lifecycle++;
+               abortController.abort();
+               timers.forEach(timer => clearTimeout(timer));
+               timers.clear();
+               input.removeEventListener('focus', onInputFocus);
+               guessButton.removeEventListener('click', onGuessClick);
+               input.removeEventListener('keypress', onInputKeypress);
+               safeButton.removeEventListener('click', onSafeClick);
+               network.destroy();
+           }
+       };
+   }
 
-        const rows = Array.from(resultsContainer.getElementsByClassName('guess-row'));
-        rows.push(row);
-        rows.sort((a, b) => parseFloat(b.dataset.score) - parseFloat(a.dataset.score));
-        
-        resultsContainer.innerHTML = '';
-        rows.forEach(r => resultsContainer.appendChild(r));
-        setTimeout(() => { row.querySelector('.progress-bar').style.width = `${score}%`; }, 50);
-    }
+   function createDungeonAutomata(root, telemetry) {
+       const canvas = root.querySelector('#dungeon-canvas');
+       const ctx = canvas.getContext('2d');
+       const status = root.querySelector('#dungeon-status');
+       const roomEl = root.querySelector('#dungeon-room');
+       const hpEl = root.querySelector('#dungeon-hp');
+       const enemiesEl = root.querySelector('#dungeon-enemies');
+       const seedEl = root.querySelector('#dungeon-seed');
+       const buffEl = root.querySelector('#dungeon-buffs');
+       const stick = root.querySelector('#dungeon-stick');
+       const joystick = root.querySelector('#dungeon-joystick');
+       const roles = [1, 2, 3].map(index => root.querySelector(`#dungeon-role-${index}`));
+       const roleStats = {
+           Warrior: { damage: 5, cooldown: 0.9, range: 0.16, color: '#ffaa00', spell: 'CLEAVE' },
+           Mage: { damage: 8, cooldown: 1.5, range: 0.30, color: '#aa66ff', spell: 'ARCANE BURST' },
+           Rogue: { damage: 7, cooldown: 1.1, range: 0.18, color: '#00aaff', spell: 'BACKSTAB' },
+           Hunter: { damage: 6, cooldown: 1.2, range: 0.34, color: '#00ff41', spell: 'ARROW VOLLEY' },
+           Priest: { damage: 2, cooldown: 1.4, range: 0.26, color: '#ffffff', spell: 'GROUP MEND' }
+       };
+       let running = false, destroyed = false, frameId = null, lastTime = 0, room = 1, seed = 1337;
+       let hero = { x: 0.5, y: 0.5, hp: 100, maxHp: 100, speed: 0.28, damage: 1, radius: 0.035 };
+       let party = [], enemies = [], walls = [], buffChoices = [], floatingText = [], input = { x: 0, y: 0 }, keys = new Set();
+       let scoreSubmitted = false;
+       let touchId = null;
+       let newRunButton, startRun, pointerDownHandler, pointerMoveHandler, pointerUpHandler;
+       const buffButtons = [];
+       function rand() { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; }
+       function resumeLoop() {
+           if (running && frameId === null) {
+               lastTime = 0;
+               frameId = requestAnimationFrame(frame);
+           }
+       }
+       function addFloatingText(x, y, text, color) {
+           floatingText.push({ x, y, text, color, life: 1 });
+       }
+       function partyAverageHp() {
+           return party.length ? party.reduce((sum, member) => sum + member.hp / member.maxHp, 0) / party.length : hero.hp / hero.maxHp;
+       }
+       function makeRoom() {
+           walls = [];
+           for (let i = 0; i < 3 + (room % 3); i++) {
+               const wall = { x: 0.15 + rand() * 0.65, y: 0.15 + rand() * 0.65, w: 0.08 + rand() * 0.12, h: 0.05 + rand() * 0.12 };
+               const overlapsSpawn = wall.x < 0.65 && wall.x + wall.w > 0.35 && wall.y < 0.65 && wall.y + wall.h > 0.35;
+               if (!overlapsSpawn) walls.push(wall);
+           }
+           enemies = Array.from({ length: 2 + Math.min(7, room) }, () => ({ x: 0.12 + rand() * 0.76, y: 0.12 + rand() * 0.76, hp: 18 + room * 5, maxHp: 18 + room * 5, cooldown: rand() }));
+           hero.x = 0.5; hero.y = 0.5; status.textContent = `[SYS] ROOM ${room} GENERATED. AUTOMATA ENGAGED.`;
+           roomEl.textContent = room; seedEl.textContent = `DUNGEON-${seed}`;
+           hpEl.textContent = `${Math.round(hero.hp)}%`;
+           enemiesEl.textContent = enemies.length;
+           buffEl.innerHTML = '';
+       }
+       function collides(x, y) { return walls.some(w => x > w.x - hero.radius && x < w.x + w.w + hero.radius && y > w.y - hero.radius && y < w.y + w.h + hero.radius); }
+       function chooseBuff(label) {
+           const buff = buffChoices.find(choice => choice.id === label);
+           if (!buff) return;
+           buff.apply();
+           buffButtons.splice(0).forEach(button => button.remove());
+           buffEl.innerHTML = '';
+           buffChoices = [];
+           running = true;
+           makeRoom();
+           resumeLoop();
+       }
+       function offerBuffs() {
+           running = false;
+           const buffCatalog = [
+               { id: 'REPAIR', label: 'FIELD REPAIR', description: 'Restore 35% health to every party member.', apply: () => party.forEach(member => { member.hp = Math.min(member.maxHp, member.hp + 35); }) },
+               { id: 'OVERCLOCK', label: 'ARCANE OVERCLOCK', description: 'Increase every role\'s spell damage by 20%.', apply: () => party.forEach(member => { member.damage *= 1.2; }) },
+               { id: 'THRUSTERS', label: 'FORMATION THRUSTERS', description: 'Increase movement speed and tighten companion follow distance.', apply: () => { hero.speed += 0.06; party.forEach(member => { member.followDistance *= 0.8; }); } },
+               { id: 'WARDING', label: 'WARDING SIGIL', description: 'Increase every party member\'s maximum health by 20%.', apply: () => party.forEach(member => { member.maxHp *= 1.2; member.hp *= 1.2; }) },
+               { id: 'RAPID_CAST', label: 'RAPID CASTING', description: 'Reduce every autonomous spell cooldown by 15%.', apply: () => party.forEach(member => { member.cooldown *= 0.85; }) }
+           ];
+           buffChoices = buffCatalog.sort(() => rand() - 0.5).slice(0, 3);
+           status.textContent = '[SYS] ROOM CLEARED. SELECT ONE RANDOM BUFF.';
+           buffEl.innerHTML = '';
+           buffButtons.splice(0).forEach(button => button.remove());
+           buffChoices.forEach(buff => {
+               const button = document.createElement('button');
+               button.className = 'btn';
+               button.textContent = `${buff.label} — ${buff.description}`;
+               button.title = buff.description;
+               button.addEventListener('click', () => chooseBuff(buff.id));
+               buffButtons.push(button);
+               buffEl.appendChild(button);
+           });
+       }
+       function tick(dt) {
+           const dx = (keys.has('ArrowRight') || keys.has('d') ? 1 : 0) - (keys.has('ArrowLeft') || keys.has('a') ? 1 : 0) + input.x;
+           const dy = (keys.has('ArrowDown') || keys.has('s') ? 1 : 0) - (keys.has('ArrowUp') || keys.has('w') ? 1 : 0) + input.y;
+           const length = Math.hypot(dx, dy) || 1, nx = Math.max(.06, Math.min(.94, hero.x + dx / length * hero.speed * dt)), ny = Math.max(.08, Math.min(.92, hero.y + dy / length * hero.speed * dt));
+           if (!collides(nx, hero.y)) hero.x = nx; if (!collides(hero.x, ny)) hero.y = ny;
+           party.slice(1).forEach((member, index) => {
+               const targetX = hero.x + (index % 2 ? 0.08 : -0.08);
+               const targetY = hero.y + (index % 2 ? 0.08 : -0.08);
+               const followX = targetX - member.x;
+               const followY = targetY - member.y;
+               const followLength = Math.hypot(followX, followY);
+               if (followLength > member.followDistance) {
+                   member.x += followX / Math.max(followLength, 0.001) * member.followSpeed * dt;
+                   member.y += followY / Math.max(followLength, 0.001) * member.followSpeed * dt;
+               }
+           });
+           enemies.forEach(enemy => {
+               const target = party.reduce((closest, member) => {
+                   return Math.hypot(enemy.x - member.x, enemy.y - member.y) < Math.hypot(enemy.x - closest.x, enemy.y - closest.y) ? member : closest;
+               }, hero);
+               const distance = Math.hypot(enemy.x - target.x, enemy.y - target.y);
+               enemy.cooldown -= dt;
+               if (distance < .25 && enemy.cooldown <= 0) {
+                   target.hp = Math.max(0, target.hp - 2 - room * .35);
+                   addFloatingText(target.x, target.y, `-${Math.round(2 + room * .35)}`, '#ff003c');
+                   enemy.cooldown = 1.2;
+               }
+               if (distance > .12) {
+                   enemy.x += (target.x - enemy.x) / Math.max(distance, .01) * dt * .025;
+                   enemy.y += (target.y - enemy.y) / Math.max(distance, .01) * dt * .025;
+               }
+           });
+           party.forEach(member => {
+               member.cooldownRemaining -= dt;
+               if (member.role === 'Priest') {
+                   const target = party.reduce((lowest, candidate) => candidate.hp / candidate.maxHp < lowest.hp / lowest.maxHp ? candidate : lowest, member);
+                   if (target.hp < target.maxHp * 0.92 && member.cooldownRemaining <= 0) {
+                       const amount = 7 + room;
+                       target.hp = Math.min(target.maxHp, target.hp + amount);
+                       addFloatingText(target.x, target.y, `+${amount} HEAL`, '#ffffff');
+                       member.cooldownRemaining = member.cooldown;
+                   }
+                   return;
+               }
+               const target = enemies.reduce((closest, enemy) => {
+                   if (!closest) return enemy;
+                   return Math.hypot(enemy.x - member.x, enemy.y - member.y) < Math.hypot(closest.x - member.x, closest.y - member.y) ? enemy : closest;
+               }, null);
+               if (target && member.cooldownRemaining <= 0) {
+                   const distance = Math.hypot(target.x - member.x, target.y - member.y);
+                   if (distance <= member.range) {
+                       target.hp -= member.damage;
+                       addFloatingText(target.x, target.y, `-${Math.round(member.damage)} ${member.spell}`, member.color);
+                       member.cooldownRemaining = member.cooldown;
+                   }
+               }
+           });
+           enemies = enemies.filter(enemy => enemy.hp > 0);
+           floatingText = floatingText.filter(text => {
+               text.life -= dt;
+               text.y -= dt * 0.025;
+               return text.life > 0;
+           });
+           if (party.every(member => member.hp <= 0)) {
+               running = false;
+               status.textContent = '[SYS] RUN TERMINATED. START A NEW RUN.';
+               if (!scoreSubmitted) {
+                   scoreSubmitted = true;
+                   const levelScore = Math.max(0, (room - 1) * 100 + enemies.length);
+                   submitArcadeScore('dungeon-automata', levelScore, `${levelScore} level score`, { level: room - 1, rooms: Math.max(0, room - 1), enemies: enemies.length, buffs: buffChoices.length });
+               }
+           }
+           if (!enemies.length && running) { room++; offerBuffs(); }
+           hpEl.textContent = `${Math.round(partyAverageHp() * 100)}%`; enemiesEl.textContent = enemies.length;
+       }
+       function draw() {
+           const width = canvas.clientWidth || 600, height = canvas.clientHeight || 360, dpr = window.devicePixelRatio || 1;
+           if (canvas.width !== width * dpr || canvas.height !== height * dpr) { canvas.width = width * dpr; canvas.height = height * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0); }
+           ctx.clearRect(0, 0, width, height); ctx.strokeStyle = '#2d7337'; ctx.strokeRect(8, 8, width - 16, height - 16);
+           walls.forEach(w => { ctx.fillStyle = '#202020'; ctx.strokeStyle = '#555'; ctx.fillRect(w.x * width, w.y * height, w.w * width, w.h * height); ctx.strokeRect(w.x * width, w.y * height, w.w * width, w.h * height); });
+           enemies.forEach(enemy => { ctx.fillStyle = '#ff003c'; ctx.beginPath(); ctx.arc(enemy.x * width, enemy.y * height, 9, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = '#222'; ctx.fillRect(enemy.x * width - 12, enemy.y * height - 16, 24, 3); ctx.fillStyle = '#ff003c'; ctx.fillRect(enemy.x * width - 12, enemy.y * height - 16, 24 * enemy.hp / enemy.maxHp, 3); });
+           party.forEach((member, index) => {
+               ctx.fillStyle = member.color;
+               ctx.beginPath();
+               ctx.arc(member.x * width, member.y * height, index === 0 ? 12 : 9, 0, Math.PI * 2);
+               ctx.fill();
+               ctx.fillStyle = '#222';
+               ctx.fillRect(member.x * width - 12, member.y * height - 16, 24, 3);
+               ctx.fillStyle = member.color;
+               ctx.fillRect(member.x * width - 12, member.y * height - 16, 24 * Math.max(0, member.hp / member.maxHp), 3);
+               ctx.fillStyle = '#fff';
+               ctx.font = '11px Courier New';
+               ctx.fillText(index === 0 ? 'MAIN' : member.role.toUpperCase(), member.x * width - 20, member.y * height - 21);
+           });
+           floatingText.forEach(text => {
+               ctx.globalAlpha = Math.max(0, text.life);
+               ctx.fillStyle = text.color;
+               ctx.font = 'bold 12px Courier New';
+               ctx.fillText(text.text, text.x * width - 20, text.y * height);
+               ctx.globalAlpha = 1;
+           });
+       }
+       function frame(timestamp) {
+           if (destroyed || !running) {
+               frameId = null;
+               return;
+           }
+           const dt = Math.min(.05, (timestamp - lastTime) / 1000 || .016);
+           tick(dt);
+           lastTime = timestamp;
+           draw();
+           frameId = running ? requestAnimationFrame(frame) : null;
+       }
+       function keyDown(event) {
+           const key = event.key.length === 1 ? event.key.toLowerCase() : event.key;
+           if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'w', 'a', 's', 'd'].includes(key)) {
+               event.preventDefault();
+               keys.add(key);
+           }
+       }
+       function keyUp(event) {
+           const key = event.key.length === 1 ? event.key.toLowerCase() : event.key;
+           keys.delete(key);
+       }
+       function joystickMove(event) { const rect = joystick.getBoundingClientRect(), x = event.clientX - (rect.left + rect.width / 2), y = event.clientY - (rect.top + rect.height / 2), length = Math.min(34, Math.hypot(x, y)), angle = Math.atan2(y, x); input = { x: Math.cos(angle) * length / 34, y: Math.sin(angle) * length / 34 }; stick.style.left = `${35 + input.x * 34}px`; stick.style.top = `${35 + input.y * 34}px`; }
+       function joystickEnd() { touchId = null; input = { x: 0, y: 0 }; stick.style.left = '35px'; stick.style.top = '35px'; }
+       return {
+           init() {
+               newRunButton = root.querySelector('#dungeon-new');
+               startRun = () => {
+                   room = 1;
+                   scoreSubmitted = false;
+                   seed = 1337;
+                   party = roles.map((select, index) => {
+                       const stats = roleStats[select.value];
+                       return {
+                           role: select.value,
+                           x: .5 + (index === 1 ? -.08 : index === 2 ? .08 : 0),
+                           y: .5 + (index === 1 ? .08 : index === 2 ? -.08 : 0),
+                           hp: 100,
+                           maxHp: 100,
+                           speed: .28,
+                           damage: stats.damage,
+                           cooldown: stats.cooldown,
+                           cooldownRemaining: 0,
+                           range: stats.range,
+                           color: stats.color,
+                           spell: stats.spell,
+                           followDistance: .025,
+                           followSpeed: .22,
+                           radius: index === 0 ? .035 : .028
+                       };
+                   });
+                   hero = party[0];
+                   floatingText = [];
+                   buffChoices = [];
+                   makeRoom();
+                   running = true;
+                   lastTime = 0;
+                   draw();
+                   resumeLoop();
+               };
+               newRunButton.addEventListener('click', startRun);
+               window.addEventListener('keydown', keyDown); window.addEventListener('keyup', keyUp);
+               pointerDownHandler = event => { touchId = event.pointerId; joystick.setPointerCapture(touchId); joystickMove(event); };
+               pointerMoveHandler = event => { if (event.pointerId === touchId) joystickMove(event); };
+               pointerUpHandler = joystickEnd;
+               joystick.addEventListener('pointerdown', pointerDownHandler); joystick.addEventListener('pointermove', pointerMoveHandler); joystick.addEventListener('pointerup', pointerUpHandler); joystick.addEventListener('pointercancel', pointerUpHandler);
+           },
+           start() { if (destroyed) return; if (enemies.length && !buffChoices.length && hero.hp > 0) running = true; if (running) draw(); if (frameId === null && running) { lastTime = 0; frameId = requestAnimationFrame(frame); } if (!enemies.length && hero.hp === 100) status.textContent = '[SYS] Select roles and press START RUN.'; },
+           pause() { running = false; keys.clear(); joystickEnd(); if (frameId !== null) cancelAnimationFrame(frameId); frameId = null; },
+           destroy() { destroyed = true; this.pause(); newRunButton.removeEventListener('click', startRun); buffButtons.splice(0).forEach(button => button.remove()); window.removeEventListener('keydown', keyDown); window.removeEventListener('keyup', keyUp); joystick.removeEventListener('pointerdown', pointerDownHandler); joystick.removeEventListener('pointermove', pointerMoveHandler); joystick.removeEventListener('pointerup', pointerUpHandler); joystick.removeEventListener('pointercancel', pointerUpHandler); }
+       };
+   }
 
-    function triggerWin() {
-        document.getElementById('system-status').innerText = '[SYS] TARGET ACQUIRED. GLOBAL TELEMETRY UPDATED.';
-        document.getElementById('system-status').style.color = '#ffffff';
-        document.getElementById('guess-input').disabled = true;
-        document.getElementById('guess-btn').disabled = true;
-        document.getElementById('guess-btn').classList.remove('execute-blink');
-        document.getElementById('safe-btn').style.display = 'none';
-        nodes.update({
-            id: 'TARGET',
-            label: dailyTargetWord.toUpperCase(),
-            color: { background: '#ffffff', border: '#ffffff' },
-            font: { color: '#000000', face: 'Courier New', size: 24, bold: true },
-            shape: 'star'
-        });
-    }
+   function createAlgoTrader(root, telemetry) {
+       const chart = root.querySelector('#algo-trader-chart');
+       const chartContext = chart.getContext('2d');
+       const status = root.querySelector('#algo-trader-status');
+       const orderBook = root.querySelector('#algo-order-book');
+       const priceEl = root.querySelector('#algo-price');
+       const equityEl = root.querySelector('#algo-equity');
+       const sharpeEl = root.querySelector('#algo-sharpe');
+       const positionEl = root.querySelector('#algo-position');
+       const pnlEl = root.querySelector('#algo-pnl');
+       const drawdownEl = root.querySelector('#algo-drawdown');
+       const stopInput = root.querySelector('#algo-stop');
+       const initialCash = 10000;
+       let seed = 1987;
+       let price = 100;
+       let cash = initialCash;
+       let position = 0;
+       let entryPrice = 0;
+       let peakEquity = initialCash;
+       let running = false;
+       let destroyed = false;
+       let frameId = null;
+       let lastTick = 0;
+       let lastTelemetry = 0;
+       let history = [price];
+       let returns = [];
+       let logs = [];
+       let sessionSubmitted = false;
 
-    document.getElementById('jump-to-minigame').addEventListener('click', function() {
-        this.classList.remove('blink-prompt');
-    });
-    document.getElementById('guess-input').addEventListener('focus', function() {
-        document.getElementById('minigame').classList.remove('attention-pulse');
-    });
-    document.getElementById('guess-btn').addEventListener('click', () => {
-        document.getElementById('minigame').classList.remove('attention-pulse');
-        processGuess();
-    });
-    document.getElementById('guess-input').addEventListener('keypress', function(event) {
-        if (event.key === 'Enter') {
-            event.preventDefault();
-            processGuess();
-        }
-    });
-    document.getElementById('safe-btn').addEventListener('click', function() {
-        document.getElementById('minigame').classList.remove('attention-pulse');
-        renderResult(dailyTargetWord, 100);
-        triggerWin();
-        submitGlobalScore(guessCount || 1);
-    });
+       function random() {
+           seed = (seed * 1664525 + 1013904223) >>> 0;
+           return seed / 4294967296;
+       }
+       function gaussian() {
+           return Math.sqrt(-2 * Math.log(Math.max(random(), 0.000001))) * Math.cos(Math.PI * 2 * random());
+       }
+       function equity() {
+           return cash + position * price;
+       }
+       function publish() {
+           const currentEquity = equity();
+           const drawdown = peakEquity ? ((peakEquity - currentEquity) / peakEquity) * 100 : 0;
+           const mean = returns.length ? returns.reduce((sum, value) => sum + value, 0) / returns.length : 0;
+           const variance = returns.length > 1 ? returns.reduce((sum, value) => sum + (value - mean) ** 2, 0) / (returns.length - 1) : 0;
+           const sharpe = variance > 0 ? (mean / Math.sqrt(variance)) * Math.sqrt(252) : 0;
+           priceEl.textContent = price.toFixed(2);
+           equityEl.textContent = currentEquity.toFixed(2);
+           sharpeEl.textContent = sharpe.toFixed(2);
+           positionEl.textContent = position > 0 ? `LONG ${position}` : position < 0 ? `SHORT ${Math.abs(position)}` : 'FLAT';
+           pnlEl.textContent = (currentEquity - initialCash).toFixed(2);
+           drawdownEl.textContent = `${Math.max(0, drawdown).toFixed(2)}%`;
+           telemetry(`[SYS] ALGO_TRADER_1987 | EQUITY ${currentEquity.toFixed(2)} | PNL ${(currentEquity - initialCash).toFixed(2)} | SHARPE ${sharpe.toFixed(2)}`);
+       }
+       function render() {
+           const width = chart.clientWidth || 600;
+           const height = chart.clientHeight || 260;
+           const dpr = window.devicePixelRatio || 1;
+           if (chart.width !== width * dpr || chart.height !== height * dpr) {
+               chart.width = width * dpr;
+               chart.height = height * dpr;
+               chartContext.setTransform(dpr, 0, 0, dpr, 0, 0);
+           }
+           chartContext.clearRect(0, 0, width, height);
+           const min = Math.min(...history);
+           const max = Math.max(...history);
+           const priceToY = value => height - ((value - min) / Math.max(max - min, 0.01)) * (height - 20) - 10;
+           chartContext.strokeStyle = '#2d7337';
+           chartContext.beginPath();
+           history.forEach((value, index) => {
+               const x = (index / Math.max(history.length - 1, 1)) * width;
+               const y = priceToY(value);
+               index ? chartContext.lineTo(x, y) : chartContext.moveTo(x, y);
+           });
+           chartContext.stroke();
+           if (position !== 0) {
+               chartContext.save();
+               chartContext.setLineDash([6, 4]);
+               chartContext.strokeStyle = position > 0 ? '#00ff41' : '#ff003c';
+               chartContext.beginPath();
+               chartContext.moveTo(0, priceToY(entryPrice));
+               chartContext.lineTo(width, priceToY(entryPrice));
+               chartContext.stroke();
+               chartContext.setLineDash([]);
+               chartContext.fillStyle = position > 0 ? '#00ff41' : '#ff003c';
+               chartContext.fillText(`ENTRY ${entryPrice.toFixed(2)}`, 10, priceToY(entryPrice) - 6);
+               chartContext.restore();
+           }
+           chartContext.fillStyle = '#00ff41';
+           chartContext.font = '12px Courier New';
+           chartContext.fillText(`S=${price.toFixed(2)}  μ=0.08 σ=0.22 λ=0.08`, 10, 18);
+       }
+       function tick(timestamp) {
+           if (!running || destroyed) return;
+           if (timestamp - lastTick > 250) {
+               const previous = price;
+               const dt = 1 / 252;
+               const jump = random() < 0.08 ? (random() - 0.5) * 0.08 : 0;
+               price = Math.max(1, price * Math.exp((0.08 - 0.5 * 0.22 ** 2) * dt + 0.22 * Math.sqrt(dt) * gaussian() + jump));
+               returns.push((price - previous) / previous);
+               if (returns.length > 120) returns.shift();
+               history.push(price);
+               if (history.length > 160) history.shift();
+               peakEquity = Math.max(peakEquity, equity());
+               const stopPercent = Math.max(1, Math.min(50, Number(stopInput.value) || 5)) / 100;
+               if (position > 0 && price <= entryPrice * (1 - stopPercent) || position < 0 && price >= entryPrice * (1 + stopPercent)) {
+                   closePosition('STOP-LOSS');
+               }
+               if (timestamp - lastTelemetry > 1000) {
+                   lastTelemetry = timestamp;
+                   publish();
+               }
+               render();
+               lastTick = timestamp;
+           }
+           frameId = requestAnimationFrame(tick);
+       }
+       function addLog(message, outcome = '') {
+           logs.unshift({ text: `[${new Date().toLocaleTimeString()}] ${message}`, outcome });
+           logs = logs.slice(0, 8);
+           orderBook.innerHTML = '';
+           logs.forEach(log => {
+               const row = document.createElement('div');
+               row.textContent = log.text;
+               if (log.outcome === 'win') {
+                   row.style.color = '#00ff41';
+                   row.textContent = `+ [WIN] ${log.text}`;
+               } else if (log.outcome === 'loss') {
+                   row.style.color = '#ff003c';
+                   row.textContent = `- [LOSS] ${log.text}`;
+               }
+               orderBook.appendChild(row);
+           });
+       }
+       function openPosition(direction) {
+           if (!running || position !== 0) return;
+           position = direction;
+           entryPrice = price;
+           cash -= position * price;
+           addLog(`${direction > 0 ? 'BUY' : 'SELL'} 1 @ ${price.toFixed(2)}`);
+           publish();
+       }
+       function closePosition(reason = 'CLOSE') {
+           if (!position) return;
+           const tradePnl = (price - entryPrice) * position;
+           cash += position * price;
+           addLog(`${reason} @ ${price.toFixed(2)} | PNL ${tradePnl.toFixed(2)}`, tradePnl >= 0 ? 'win' : 'loss');
+           position = 0;
+           entryPrice = 0;
+           publish();
+       }
+       function submitSession() {
+           if (sessionSubmitted || returns.length < 2) return;
+           sessionSubmitted = true;
+           const currentEquity = equity();
+           const mean = returns.reduce((sum, value) => sum + value, 0) / returns.length;
+           const variance = returns.reduce((sum, value) => sum + (value - mean) ** 2, 0) / Math.max(returns.length - 1, 1);
+           const sharpe = variance > 0 ? (mean / Math.sqrt(variance)) * Math.sqrt(252) : 0;
+           submitArcadeScore('algo-trader-1987', sharpe, `${sharpe.toFixed(2)} Sharpe`, { return: currentEquity - initialCash, drawdown: Math.max(0, (peakEquity - currentEquity) / peakEquity * 100), trades: logs.length });
+       }
+       return {
+           init() {
+               root.querySelector('#algo-buy').addEventListener('click', () => openPosition(1));
+               root.querySelector('#algo-sell').addEventListener('click', () => openPosition(-1));
+               root.querySelector('#algo-close').addEventListener('click', () => closePosition());
+               render();
+           },
+           start() {
+               if (destroyed || running) return;
+               sessionSubmitted = false;
+               running = true;
+               status.textContent = '[SYS] Market streaming. Jump process armed.';
+               frameId = requestAnimationFrame(tick);
+           },
+           pause() {
+               running = false;
+               submitSession();
+               if (frameId !== null) cancelAnimationFrame(frameId);
+               frameId = null;
+               status.textContent = '[SYS] Market paused. State preserved.';
+           },
+           destroy() {
+               destroyed = true;
+               this.pause();
+               root.querySelector('#algo-buy').replaceWith(root.querySelector('#algo-buy').cloneNode(true));
+               root.querySelector('#algo-sell').replaceWith(root.querySelector('#algo-sell').cloneNode(true));
+               root.querySelector('#algo-close').replaceWith(root.querySelector('#algo-close').cloneNode(true));
+           }
+       };
+   }
 
-    initNeuralNet();
+   function createStochasticNavigator(root, telemetry) {
+       const canvas = root.querySelector('#navigator-grid');
+       const context = canvas.getContext('2d');
+       const status = root.querySelector('#navigator-status');
+       const stateEl = root.querySelector('#navigator-state');
+       const valueEl = root.querySelector('#navigator-value');
+       const stepsEl = root.querySelector('#navigator-steps');
+       const convergenceEl = root.querySelector('#navigator-convergence');
+       const rewardEl = root.querySelector('#navigator-reward');
+       const windEl = root.querySelector('#navigator-wind');
+       const telemetryEl = root.querySelector('#navigator-telemetry');
+       const columns = 8;
+       const rows = 6;
+       const goal = { x: columns - 1, y: rows - 1 };
+       let obstacles = new Set();
+       const actions = [{ x: 0, y: -1, symbol: '↑' }, { x: 1, y: 0, symbol: '→' }, { x: 0, y: 1, symbol: '↓' }, { x: -1, y: 0, symbol: '←' }];
+       const values = Array.from({ length: rows }, () => Array(columns).fill(0));
+       const policy = Array.from({ length: rows }, () => Array(columns).fill(1));
+       let probe = { x: 0, y: 0 };
+       let steps = 0;
+       let totalReward = 0;
+       let convergence = 0;
+       let running = false;
+       let autoRun = false;
+       let destroyed = false;
+       let animationFrame = null;
+       let solverTimer = null;
+       let lastMove = 0;
+       let seed = 4242;
+       let goalSubmitted = false;
+       let logEntries = [];
+
+       function random() {
+           seed = (seed * 1664525 + 1013904223) >>> 0;
+           return seed / 4294967296;
+       }
+       function key(x, y) {
+           return `${x},${y}`;
+       }
+       function isBlocked(x, y) {
+           return x < 0 || x >= columns || y < 0 || y >= rows || obstacles.has(key(x, y));
+       }
+       function nextState(x, y, action) {
+           const nextX = x + action.x;
+           const nextY = y + action.y;
+           return isBlocked(nextX, nextY) ? { x, y } : { x: nextX, y: nextY };
+       }
+       function findShortestPath() {
+           const startKey = key(0, 0);
+           const goalKey = key(goal.x, goal.y);
+           const queue = [{ x: 0, y: 0 }];
+           const visited = new Set([startKey]);
+           const parent = new Map();
+           while (queue.length) {
+               const current = queue.shift();
+               if (key(current.x, current.y) === goalKey) break;
+               actions.forEach((action, actionIndex) => {
+                   const next = nextState(current.x, current.y, action);
+                   const nextKey = key(next.x, next.y);
+                   if (!visited.has(nextKey)) {
+                       visited.add(nextKey);
+                       parent.set(nextKey, { previous: key(current.x, current.y), actionIndex });
+                       queue.push(next);
+                   }
+               });
+           }
+           if (!visited.has(goalKey)) return null;
+           const path = [];
+           let currentKey = goalKey;
+           while (currentKey !== startKey) {
+               const step = parent.get(currentKey);
+               path.unshift({ state: currentKey, actionIndex: step.actionIndex });
+               currentKey = step.previous;
+           }
+           path.unshift({ state: startKey, actionIndex: null });
+           return path;
+       }
+       function buildShortestPolicy() {
+           const distances = Array.from({ length: rows }, () => Array(columns).fill(Infinity));
+           const queue = [{ x: goal.x, y: goal.y }];
+           distances[goal.y][goal.x] = 0;
+           while (queue.length) {
+               const current = queue.shift();
+               actions.forEach((action, actionIndex) => {
+                   const previous = { x: current.x - action.x, y: current.y - action.y };
+                   if (isBlocked(previous.x, previous.y) || distances[previous.y][previous.x] !== Infinity) return;
+                   distances[previous.y][previous.x] = distances[current.y][current.x] + 1;
+                   policy[previous.y][previous.x] = actionIndex;
+                   queue.push(previous);
+               });
+           }
+           return distances;
+       }
+       function generateGrid() {
+           const candidates = [];
+           for (let y = 0; y < rows; y++) {
+               for (let x = 0; x < columns; x++) {
+                   if ((x === 0 && y === 0) || (x === goal.x && y === goal.y)) continue;
+                   candidates.push({ x, y });
+               }
+           }
+           for (let attempt = 0; attempt < 40; attempt++) {
+               const candidatePool = candidates.slice();
+               const nextObstacles = new Set();
+               while (nextObstacles.size < 7 && candidatePool.length) {
+                   const index = Math.floor(random() * candidatePool.length);
+                   const candidate = candidatePool.splice(index, 1)[0];
+                   nextObstacles.add(key(candidate.x, candidate.y));
+               }
+               obstacles = nextObstacles;
+               if (findShortestPath()) return;
+           }
+           obstacles = new Set(['2,1', '2,2', '4,3', '5,3']);
+       }
+       function solveShortestPath() {
+           const path = findShortestPath();
+           const distances = buildShortestPolicy();
+           if (!path || !Number.isFinite(distances[0][0])) {
+               status.textContent = '[SYS] ERROR: No valid path to goal.';
+               return 0;
+           }
+           values.forEach(row => row.fill(-5));
+           for (let y = 0; y < rows; y++) {
+               for (let x = 0; x < columns; x++) {
+                   if (Number.isFinite(distances[y][x])) values[y][x] = 10 - distances[y][x];
+               }
+           }
+           convergence = 0;
+           addLog(`SHORTEST POLICY | ${distances[0][0]} STEPS | ${obstacles.size} RANDOM OBSTACLES`);
+           draw();
+           updateDashboard();
+           return distances[0][0];
+       }
+       function actionValue(x, y, action) {
+           const next = nextState(x, y, action);
+           const reward = next.x === goal.x && next.y === goal.y ? 10 : next.x === x && next.y === y ? -2 : -0.1;
+           return reward + 0.92 * values[next.y][next.x];
+       }
+       function chooseBestAction(x, y) {
+           let bestIndex = 0;
+           let bestValue = -Infinity;
+           actions.forEach((action, index) => {
+               const candidate = actionValue(x, y, action);
+               if (candidate > bestValue) {
+                   bestValue = candidate;
+                   bestIndex = index;
+               }
+           });
+           return bestIndex;
+       }
+       function addLog(message) {
+           logEntries.unshift(`[${new Date().toLocaleTimeString()}] ${message}`);
+           logEntries = logEntries.slice(0, 7);
+           telemetryEl.innerHTML = '';
+           logEntries.forEach(entry => {
+               const line = document.createElement('div');
+               line.textContent = entry;
+               telemetryEl.appendChild(line);
+           });
+       }
+       function updateDashboard(wind = 0) {
+           stateEl.textContent = `${probe.x},${probe.y}`;
+           valueEl.textContent = values[probe.y][probe.x].toFixed(2);
+           stepsEl.textContent = String(steps);
+           convergenceEl.textContent = convergence.toFixed(3);
+           rewardEl.textContent = totalReward.toFixed(2);
+           windEl.textContent = `${Math.round(wind * 100)}%`;
+           telemetry(`[SYS] STOCHASTIC_NAVIGATOR | STATE ${probe.x},${probe.y} | REWARD ${totalReward.toFixed(2)} | CONVERGENCE ${convergence.toFixed(3)}`);
+       }
+       function draw() {
+           const width = canvas.clientWidth || 600;
+           const height = canvas.clientHeight || 340;
+           const dpr = window.devicePixelRatio || 1;
+           if (canvas.width !== width * dpr || canvas.height !== height * dpr) {
+               canvas.width = width * dpr;
+               canvas.height = height * dpr;
+               context.setTransform(dpr, 0, 0, dpr, 0, 0);
+           }
+           const cellWidth = width / columns;
+           const cellHeight = height / rows;
+           const maxValue = Math.max(...values.flat(), 1);
+           const minValue = Math.min(...values.flat(), 0);
+           context.clearRect(0, 0, width, height);
+           context.font = `${Math.max(14, Math.min(cellWidth, cellHeight) * 0.5)}px Courier New`;
+           context.textAlign = 'center';
+           context.textBaseline = 'middle';
+           for (let y = 0; y < rows; y++) {
+               for (let x = 0; x < columns; x++) {
+                   const normalized = (values[y][x] - minValue) / Math.max(maxValue - minValue, 0.01);
+                   context.fillStyle = obstacles.has(key(x, y)) ? '#202020' : `rgb(0, ${Math.round(45 + normalized * 170)}, ${Math.round(20 + normalized * 50)})`;
+                   context.fillRect(x * cellWidth, y * cellHeight, cellWidth, cellHeight);
+                   context.strokeStyle = '#2d7337';
+                   context.strokeRect(x * cellWidth, y * cellHeight, cellWidth, cellHeight);
+                   if (!obstacles.has(key(x, y))) {
+                       context.fillStyle = '#00ff41';
+                       context.fillText(actions[policy[y][x]].symbol, x * cellWidth + cellWidth / 2, y * cellHeight + cellHeight / 2);
+                   }
+               }
+           }
+           context.fillStyle = '#ffffff';
+           context.fillText('GOAL', goal.x * cellWidth + cellWidth / 2, goal.y * cellHeight + cellHeight / 2);
+           context.fillStyle = '#ff003c';
+           context.beginPath();
+           context.arc(probe.x * cellWidth + cellWidth / 2, probe.y * cellHeight + cellHeight / 2, Math.min(cellWidth, cellHeight) * 0.22, 0, Math.PI * 2);
+           context.fill();
+           context.fillStyle = '#050505';
+           context.fillText('●', probe.x * cellWidth + cellWidth / 2, probe.y * cellHeight + cellHeight / 2);
+       }
+       function solveStep() {
+           let maxDelta = 0;
+           const nextValues = values.map(row => row.slice());
+           for (let y = 0; y < rows; y++) {
+               for (let x = 0; x < columns; x++) {
+                   if (obstacles.has(key(x, y)) || (x === goal.x && y === goal.y)) continue;
+                   const best = Math.max(...actions.map(action => actionValue(x, y, action)));
+                   nextValues[y][x] = best;
+                   maxDelta = Math.max(maxDelta, Math.abs(best - values[y][x]));
+               }
+           }
+           for (let y = 0; y < rows; y++) values[y].splice(0, columns, ...nextValues[y]);
+           convergence = maxDelta;
+           draw();
+           updateDashboard();
+           return maxDelta;
+       }
+       function moveProbe() {
+           if (!running || probe.x === goal.x && probe.y === goal.y) return;
+           const selected = actions[policy[probe.y][probe.x]];
+           const noise = random();
+           const windAction = noise < 0.15 ? actions[(policy[probe.y][probe.x] + 1) % actions.length] : noise < 0.30 ? actions[(policy[probe.y][probe.x] + 3) % actions.length] : selected;
+           const previous = probe;
+           const next = nextState(probe.x, probe.y, windAction);
+           const wind = windAction === selected ? 0 : 1;
+           probe = next;
+           steps++;
+           const moved = next.x !== previous.x || next.y !== previous.y;
+           totalReward += probe.x === goal.x && probe.y === goal.y ? 10 : moved ? -0.1 : -2;
+           addLog(`PROBE ${probe.x},${probe.y} | ${wind ? 'WIND DEVIATION' : 'POLICY VECTOR'}`);
+           updateDashboard(wind);
+           if (probe.x === goal.x && probe.y === goal.y) {
+               autoRun = false;
+               status.textContent = `[SYS] GOAL REACHED in ${steps} steps.`;
+               addLog(`GOAL REACHED | SCORE ${totalReward.toFixed(2)}`);
+               if (!goalSubmitted) {
+                   goalSubmitted = true;
+                   const efficiency = Math.max(0, 1000 / Math.max(steps, 1));
+                   submitArcadeScore('stochastic-navigator', efficiency, `${efficiency.toFixed(1)} efficiency`, { steps, reward: totalReward, convergence });
+               }
+           }
+       }
+       function frame(timestamp) {
+           if (!running || destroyed) return;
+           if (autoRun && timestamp - lastMove > 500) {
+               moveProbe();
+               lastMove = timestamp;
+           }
+           draw();
+           animationFrame = requestAnimationFrame(frame);
+       }
+       function reset() {
+           generateGrid();
+           goalSubmitted = false;
+           probe = { x: 0, y: 0 };
+           steps = 0;
+           totalReward = 0;
+           convergence = 0;
+           autoRun = false;
+           for (let y = 0; y < rows; y++) {
+               values[y].fill(0);
+               policy[y].fill(1);
+           }
+           addLog(`GRID RESET | START 0,0 | GOAL 7,5 | ${obstacles.size} RANDOM OBSTACLES`);
+           updateDashboard();
+           draw();
+       }
+       function onCanvasClick(event) {
+           const bounds = canvas.getBoundingClientRect();
+           const x = Math.floor(((event.clientX - bounds.left) / bounds.width) * columns);
+           const y = Math.floor(((event.clientY - bounds.top) / bounds.height) * rows);
+           if (x >= 0 && x < columns && y >= 0 && y < rows && !obstacles.has(key(x, y))) {
+               policy[y][x] = (policy[y][x] + 1) % actions.length;
+               addLog(`POLICY ${x},${y} -> ${actions[policy[y][x]].symbol}`);
+               draw();
+           }
+       }
+       return {
+           init() {
+               root.querySelector('#navigator-solve').addEventListener('click', () => {
+                   if (running) {
+                       const shortestSteps = solveShortestPath();
+                       for (let iteration = 0; iteration < 8; iteration++) solveStep();
+                       solveShortestPath();
+                       status.textContent = `[SYS] Shortest policy found: ${shortestSteps} steps.`;
+                   }
+               });
+               root.querySelector('#navigator-step').addEventListener('click', () => moveProbe());
+               root.querySelector('#navigator-run').addEventListener('click', () => {
+                   if (probe.x === goal.x && probe.y === goal.y) reset();
+                   autoRun = !autoRun;
+                   status.textContent = autoRun ? '[SYS] Probe rollout active.' : '[SYS] Probe rollout paused.';
+               });
+               root.querySelector('#navigator-reset').addEventListener('click', reset);
+               canvas.addEventListener('click', onCanvasClick);
+               reset();
+           },
+           start() {
+               if (destroyed || running) return;
+               running = true;
+               status.textContent = '[SYS] Navigator online. Turbulence field active.';
+               animationFrame = requestAnimationFrame(frame);
+               solverTimer = setInterval(() => {
+                   if (running && convergence > 0.001) solveStep();
+               }, 150);
+           },
+           pause() {
+               running = false;
+               autoRun = false;
+               if (animationFrame !== null) cancelAnimationFrame(animationFrame);
+               if (solverTimer !== null) clearInterval(solverTimer);
+               animationFrame = null;
+               solverTimer = null;
+               status.textContent = '[SYS] Navigator paused. State preserved.';
+           },
+           destroy() {
+               destroyed = true;
+               this.pause();
+               canvas.removeEventListener('click', onCanvasClick);
+           }
+       };
+   }
+
+   function createQuantumCraps(root, telemetry) {
+       const canvas = root.querySelector('#craps-chart');
+       const context = canvas.getContext('2d');
+       const status = root.querySelector('#craps-status');
+       const bankrollEl = root.querySelector('#craps-bankroll');
+       const evEl = root.querySelector('#craps-ev');
+       const varianceEl = root.querySelector('#craps-variance');
+       const edgeEl = root.querySelector('#craps-edge');
+       const kellyEl = root.querySelector('#craps-kelly');
+       const riskEl = root.querySelector('#craps-risk');
+       const drawdownEl = root.querySelector('#craps-drawdown');
+       const roundEl = root.querySelector('#craps-round');
+       const outcomeEl = root.querySelector('#craps-outcome');
+       const stakeInput = root.querySelector('#craps-stake');
+       const log = root.querySelector('#craps-log');
+       const outcomeButtons = Array.from(root.querySelectorAll('[data-craps-outcome]'));
+       const outcomes = {
+           red: { label: 'RED', probability: 0.45, payout: 1.1, color: '#ff003c' },
+           blue: { label: 'BLUE', probability: 0.35, payout: 1.8, color: '#00aaff' },
+           green: { label: 'GREEN', probability: 0.20, payout: 4.0, color: '#00ff41' }
+       };
+       let bankroll = 1000;
+       let peakBankroll = bankroll;
+       let round = 0;
+       let selected = 'red';
+       let seed = 8675309;
+       let running = false;
+       let destroyed = false;
+       let bankrollHistory = [bankroll];
+       let logEntries = [];
+
+       function random() {
+           seed = (seed * 1664525 + 1013904223) >>> 0;
+           return seed / 4294967296;
+       }
+       function currentProbabilities() {
+           const phase = Math.sin(round * 0.65) * 0.04;
+           const drift = Math.cos(round * 0.31) * 0.025;
+           return {
+               red: Math.max(0.05, outcomes.red.probability + phase),
+               blue: Math.max(0.05, outcomes.blue.probability + drift),
+               green: Math.max(0.05, outcomes.green.probability - phase - drift)
+           };
+       }
+       function getStats() {
+           const probabilities = currentProbabilities();
+           const selectedOutcome = outcomes[selected];
+           const p = probabilities[selected];
+           const b = selectedOutcome.payout;
+           const q = 1 - p;
+           const ev = b * p - q;
+           const variance = p * (b - ev) ** 2 + q * (-1 - ev) ** 2;
+           const kelly = Math.max(0, Math.min(0.25, ev / Math.max(b, 0.01)));
+           const drawdown = peakBankroll ? ((peakBankroll - bankroll) / peakBankroll) * 100 : 0;
+           const riskOfRuin = Math.min(100, Math.max(0, Math.exp((-2 * bankroll) / Math.max(variance * 100, 1)) * 100));
+           return { probabilities, ev, variance, kelly, drawdown, riskOfRuin };
+       }
+       function addLog(message, won) {
+           logEntries.unshift({ message: `[${new Date().toLocaleTimeString()}] ${message}`, won });
+           logEntries = logEntries.slice(0, 8);
+           log.innerHTML = '';
+           logEntries.forEach(entry => {
+               const line = document.createElement('div');
+               line.textContent = `${entry.won === true ? '+ [WIN] ' : entry.won === false ? '- [LOSS] ' : ''}${entry.message}`;
+               line.style.color = entry.won === true ? '#00ff41' : entry.won === false ? '#ff003c' : 'var(--text-muted)';
+               log.appendChild(line);
+           });
+       }
+       function draw() {
+           const width = canvas.clientWidth || 600;
+           const height = canvas.clientHeight || 260;
+           const dpr = window.devicePixelRatio || 1;
+           if (canvas.width !== width * dpr || canvas.height !== height * dpr) {
+               canvas.width = width * dpr;
+               canvas.height = height * dpr;
+               context.setTransform(dpr, 0, 0, dpr, 0, 0);
+           }
+           context.clearRect(0, 0, width, height);
+           const stats = getStats();
+           context.font = '12px Courier New';
+           context.textAlign = 'left';
+           context.textBaseline = 'middle';
+           ['red', 'blue', 'green'].forEach((name, index) => {
+               const probability = stats.probabilities[name];
+               const barWidth = probability * width * 1.5;
+               const y = 28 + index * 32;
+               context.fillStyle = outcomes[name].color;
+               context.fillText(`${outcomes[name].label} ${(probability * 100).toFixed(1)}%`, 10, y);
+               context.globalAlpha = 0.7;
+               context.fillRect(120, y - 8, barWidth, 16);
+               context.globalAlpha = 1;
+           });
+           const chartTop = 140;
+           const chartHeight = height - chartTop - 15;
+           const minBankroll = Math.min(...bankrollHistory, 0);
+           const maxBankroll = Math.max(...bankrollHistory, 1000);
+           context.strokeStyle = '#2d7337';
+           context.beginPath();
+           bankrollHistory.forEach((value, index) => {
+               const x = (index / Math.max(bankrollHistory.length - 1, 1)) * width;
+               const y = chartTop + chartHeight - ((value - minBankroll) / Math.max(maxBankroll - minBankroll, 1)) * chartHeight;
+               index ? context.lineTo(x, y) : context.moveTo(x, y);
+           });
+           context.stroke();
+           context.fillStyle = '#00ff41';
+           context.fillText('BANKROLL HISTORY', 10, chartTop + 12);
+       }
+       function updateDashboard() {
+           const stats = getStats();
+           bankrollEl.textContent = bankroll.toFixed(2);
+           evEl.textContent = stats.ev.toFixed(3);
+           varianceEl.textContent = stats.variance.toFixed(3);
+           edgeEl.textContent = `${Math.max(0, -stats.ev * 100).toFixed(2)}%`;
+           kellyEl.textContent = `${(stats.kelly * 100).toFixed(2)}%`;
+           riskEl.textContent = `${stats.riskOfRuin.toFixed(2)}%`;
+           drawdownEl.textContent = `${Math.max(0, stats.drawdown).toFixed(2)}%`;
+           roundEl.textContent = String(round);
+           telemetry(`[SYS] QUANTUM_CRAPS | BANKROLL ${bankroll.toFixed(2)} | EV ${stats.ev.toFixed(3)} | RISK ${stats.riskOfRuin.toFixed(2)}%`);
+           draw();
+       }
+       function settleBet(stake) {
+           if (!running || bankroll <= 0) return;
+           const amount = Math.max(1, Math.min(bankroll, Number(stake) || 0));
+           const probabilities = currentProbabilities();
+           const roll = random();
+           let cumulative = 0;
+           let result = 'green';
+           for (const name of ['red', 'blue', 'green']) {
+               cumulative += probabilities[name];
+               if (roll <= cumulative) {
+                   result = name;
+                   break;
+               }
+           }
+           const won = result === selected;
+           bankroll += won ? amount * outcomes[selected].payout : -amount;
+           peakBankroll = Math.max(peakBankroll, bankroll);
+           round++;
+           bankrollHistory.push(bankroll);
+           if (bankrollHistory.length > 80) bankrollHistory.shift();
+           outcomeEl.textContent = outcomes[result].label;
+           status.textContent = won ? `[SYS] WIN: ${outcomes[result].label} outcome. Allocation survived.` : `[SYS] LOSS: ${outcomes[result].label} outcome. Reprice the risk.`;
+           addLog(`${outcomes[selected].label} STAKE ${amount.toFixed(2)} -> ${outcomes[result].label} | BANKROLL ${bankroll.toFixed(2)}`, won);
+           updateDashboard();
+       }
+       function selectOutcome(name) {
+           selected = name;
+           outcomeButtons.forEach(button => {
+               button.style.color = button.dataset.crapsOutcome === selected ? outcomes[selected].color : '';
+           });
+           updateDashboard();
+       }
+       function reset() {
+           if (round > 0) {
+               submitArcadeScore('quantum-craps', bankroll, `${bankroll.toFixed(2)} bankroll`, { drawdown: getStats().drawdown, riskOfRuin: getStats().riskOfRuin, rounds: round });
+           }
+           bankroll = 1000;
+           peakBankroll = bankroll;
+           round = 0;
+           seed = 8675309;
+           bankrollHistory = [bankroll];
+           outcomeEl.textContent = '---';
+           logEntries = [];
+           addLog('BANKROLL RESET | VIRTUAL CAPITAL 1000.00');
+           updateDashboard();
+       }
+       const handlers = new Map();
+       return {
+           init() {
+               outcomeButtons.forEach(button => {
+                   const handler = () => {
+                       selectOutcome(button.dataset.crapsOutcome);
+                       settleBet(stakeInput.value);
+                   };
+                   handlers.set(button, handler);
+                   button.addEventListener('click', handler);
+               });
+               const kellyHandler = () => {
+                   const kellyStake = bankroll * getStats().kelly;
+                   stakeInput.value = Math.max(1, kellyStake).toFixed(2);
+                   settleBet(kellyStake);
+               };
+               const resetHandler = () => reset();
+               handlers.set(root.querySelector('#craps-kelly-bet'), kellyHandler);
+               handlers.set(root.querySelector('#craps-reset'), resetHandler);
+               root.querySelector('#craps-kelly-bet').addEventListener('click', kellyHandler);
+               root.querySelector('#craps-reset').addEventListener('click', resetHandler);
+               reset();
+           },
+           start() {
+               if (destroyed || running) return;
+               running = true;
+               status.textContent = '[SYS] Quantum craps online. Virtual bankroll only.';
+               updateDashboard();
+           },
+           pause() {
+               running = false;
+               status.textContent = '[SYS] Casino paused. Bankroll state preserved.';
+           },
+           destroy() {
+               destroyed = true;
+               this.pause();
+               handlers.forEach((handler, element) => element.removeEventListener('click', handler));
+               handlers.clear();
+           }
+       };
+   }
+
+   function createPidStabilizer(root, telemetry) {
+       const canvas = root.querySelector('#pid-canvas');
+       const context = canvas.getContext('2d');
+       const status = root.querySelector('#pid-status');
+       const angleEl = root.querySelector('#pid-angle');
+       const rateEl = root.querySelector('#pid-rate');
+       const errorEl = root.querySelector('#pid-error');
+       const controlEl = root.querySelector('#pid-control');
+       const survivalEl = root.querySelector('#pid-survival');
+       const stabilityEl = root.querySelector('#pid-stability');
+       const stableTimerEl = root.querySelector('#pid-stable-timer');
+       const dotCountEl = root.querySelector('#pid-dot-count');
+       const gainsEl = root.querySelector('#pid-gains');
+       const kpInput = root.querySelector('#pid-kp');
+       const kiInput = root.querySelector('#pid-ki');
+       const kdInput = root.querySelector('#pid-kd');
+       const resetButton = root.querySelector('#pid-reset');
+       const shockLeftButton = root.querySelector('#pid-shock-left');
+       const shockRightButton = root.querySelector('#pid-shock-right');
+       let angle = 0.08;
+       let angularRate = 0;
+       let cartPosition = 0;
+       let cartVelocity = 0;
+       let integral = 0;
+       let previousError = -angle;
+       let filteredDerivative = 0;
+       let control = 0;
+       let actuator = 0;
+       let wind = 0;
+       let elapsed = 0;
+       let lastFrame = 0;
+       let lastTelemetry = 0;
+       let lastDashboard = 0;
+       let running = false;
+       let destroyed = false;
+       let frameId = null;
+       let physicsTimer = null;
+       let shockUntil = 0;
+       let stableElapsed = 0;
+       let dotCount = 1;
+       let scoreSubmitted = false;
+       const segmentAngles = [angle];
+       const segmentRates = [0];
+       const stabilityThreshold = 10;
+       const stabilityAngleLimit = 0.14;
+       const stabilityRateLimit = 0.3;
+       let errorHistory = [];
+       let phaseHistory = [];
+       let handlers = new Map();
+       let seed = 314159;
+
+       function random() {
+           seed = (seed * 1664525 + 1013904223) >>> 0;
+           return seed / 4294967296;
+       }
+       function gaussian() {
+           return Math.sqrt(-2 * Math.log(Math.max(random(), 0.000001))) * Math.cos(Math.PI * 2 * random());
+       }
+       function gains() {
+           return { kp: Number(kpInput.value), ki: Number(kiInput.value), kd: Number(kdInput.value) };
+       }
+       function updateGainLabel() {
+           const values = gains();
+           gainsEl.textContent = `Kp=${values.kp.toFixed(1)} | Ki=${values.ki.toFixed(2)} | Kd=${values.kd.toFixed(1)}`;
+       }
+       function reset() {
+           angle = 0.08;
+           angularRate = 0;
+           segmentAngles.length = 1;
+           segmentRates.length = 1;
+           segmentAngles[0] = angle;
+           segmentRates[0] = angularRate;
+           cartPosition = 0;
+           cartVelocity = 0;
+           integral = 0;
+           previousError = -angle;
+           filteredDerivative = 0;
+           control = 0;
+           actuator = 0;
+           wind = 0;
+           elapsed = 0;
+           lastFrame = 0;
+           lastDashboard = 0;
+           shockUntil = 0;
+           stableElapsed = 0;
+           dotCount = 1;
+           scoreSubmitted = false;
+           errorHistory = [];
+           phaseHistory = [];
+           updateGainLabel();
+           status.textContent = '[SYS] Pole reset. Stabilizer ready.';
+           draw();
+           updateDashboard();
+       }
+       function triggerShock(direction) {
+           const impulse = 2.4 + Math.abs(gaussian()) * 0.5;
+           wind += direction * impulse;
+           shockUntil = elapsed + 1.2;
+           status.textContent = direction < 0
+               ? '[SYS] LEFT WIND IMPULSE. COUNTER THE LEAN WITH THE GAINS.'
+               : '[SYS] RIGHT WIND IMPULSE. COUNTER THE LEAN WITH THE GAINS.';
+       }
+       function updatePhysics(dt) {
+           const values = gains();
+           const measuredAngle = angle + gaussian() * 0.004;
+           const error = -measuredAngle;
+           integral = Math.max(-2, Math.min(2, integral + error * dt));
+           const rawDerivative = (error - previousError) / Math.max(dt, 0.001);
+           filteredDerivative = filteredDerivative * 0.72 + rawDerivative * 0.28;
+           const desiredControl = Math.max(-10, Math.min(10, values.kp * error + values.ki * integral + values.kd * filteredDerivative));
+           actuator += (desiredControl - actuator) * Math.min(1, dt * 3.5);
+           actuator = Math.max(-8.5, Math.min(8.5, actuator));
+           control = actuator;
+           if (elapsed > shockUntil && random() < dt * 0.35) wind += gaussian() * 2.3;
+           wind *= Math.exp(-3 * dt);
+           const angularAcceleration = (9.81 / 1.2) * Math.sin(angle) + control * 0.55 + wind - angularRate * 0.85;
+           angularRate += angularAcceleration * dt;
+           angle += angularRate * dt;
+           segmentAngles[0] = angle;
+           segmentRates[0] = angularRate;
+           cartVelocity += (control * 0.02 - cartVelocity * 0.9) * dt;
+           cartPosition += cartVelocity * dt;
+           cartPosition = Math.max(-1, Math.min(1, cartPosition));
+           previousError = error;
+           for (let index = 1; index < dotCount; index += 1) {
+               const parentAngle = segmentAngles[index - 1];
+               const segmentAngle = segmentAngles[index];
+               const coupling = (parentAngle - segmentAngle) * (8.5 + index * 1.5);
+               const segmentAcceleration = (9.81 / 1.2) * Math.sin(segmentAngle) + coupling - segmentRates[index] * 1.15;
+               segmentRates[index] += segmentAcceleration * dt;
+               segmentAngles[index] += segmentRates[index] * dt;
+           }
+           const stable = segmentAngles.slice(0, dotCount).every((segmentAngle, index) =>
+               Math.abs(segmentAngle) <= stabilityAngleLimit && Math.abs(segmentRates[index]) <= stabilityRateLimit
+           );
+           if (stable) {
+               stableElapsed += dt;
+               if (stableElapsed >= stabilityThreshold && dotCount < 3) {
+                   dotCount += 1;
+                   segmentAngles[dotCount - 1] = segmentAngles[dotCount - 2] + gaussian() * 0.01;
+                   segmentRates[dotCount - 1] = segmentRates[dotCount - 2];
+                   stableElapsed = 0;
+                   status.textContent = `[SYS] STABILITY LOCKED. ${dotCount}/3 PENDULUM DOTS ACTIVE.`;
+                   if (dotCount === 3 && !scoreSubmitted) {
+                       scoreSubmitted = true;
+                       submitArcadeScore('pid-stabilizer', elapsed, `${elapsed.toFixed(1)}s survival`, { stability: Math.max(0, 100 - Math.abs(angle) * 420), maxAngle: Math.max(...segmentAngles.map(value => Math.abs(value))), dots: dotCount });
+                   }
+               }
+           } else {
+               stableElapsed = 0;
+           }
+           errorHistory.push(error);
+           phaseHistory.push({ angle, rate: angularRate });
+           if (errorHistory.length > 160) errorHistory.shift();
+           if (phaseHistory.length > 160) phaseHistory.shift();
+       }
+       function updateDashboard() {
+           const error = -angle;
+           const maxAngle = Math.max(...segmentAngles.slice(0, dotCount).map(segmentAngle => Math.abs(segmentAngle)));
+           const maxRate = Math.max(...segmentRates.slice(0, dotCount).map(segmentRate => Math.abs(segmentRate)));
+           const stability = Math.max(0, 100 - maxAngle * 420 - maxRate * 12);
+           angleEl.textContent = `${(angle * 180 / Math.PI).toFixed(2)}°`;
+           rateEl.textContent = angularRate.toFixed(2);
+           errorEl.textContent = error.toFixed(3);
+           controlEl.textContent = control.toFixed(2);
+           survivalEl.textContent = `${elapsed.toFixed(1)}s`;
+           stabilityEl.textContent = `${stability.toFixed(1)}%`;
+           stableTimerEl.textContent = `${stableElapsed.toFixed(1)} / ${stabilityThreshold.toFixed(1)}s`;
+           dotCountEl.textContent = `${dotCount} / 3`;
+           telemetry(`[SYS] PID_STABILIZER | ANGLE ${(angle * 180 / Math.PI).toFixed(2)}° | CONTROL ${control.toFixed(2)} | STABILITY ${stability.toFixed(1)}%`);
+       }
+       function draw() {
+           const width = canvas.clientWidth || 600;
+           const height = canvas.clientHeight || 360;
+           const dpr = window.devicePixelRatio || 1;
+           if (canvas.width !== width * dpr || canvas.height !== height * dpr) {
+               canvas.width = width * dpr;
+               canvas.height = height * dpr;
+               context.setTransform(dpr, 0, 0, dpr, 0, 0);
+           }
+           context.clearRect(0, 0, width, height);
+           const groundY = height * 0.62;
+           const cartX = width / 2 + cartPosition * width * 0.35;
+           const cartWidth = 70;
+           const armLength = Math.min(105, (groundY - 20) / dotCount);
+           const stable = segmentAngles.slice(0, dotCount).every((segmentAngle, index) =>
+               Math.abs(segmentAngle) <= stabilityAngleLimit && Math.abs(segmentRates[index]) <= stabilityRateLimit
+           );
+           const coneColor = stable ? 'rgba(0, 255, 65, 0.16)' : 'rgba(255, 170, 0, 0.10)';
+           const coneStroke = stable ? '#00ff41' : '#ffaa00';
+           const coneHalfWidth = Math.tan(stabilityAngleLimit) * armLength;
+           context.fillStyle = coneColor;
+           context.beginPath();
+           context.moveTo(cartX, groundY);
+           context.lineTo(cartX - coneHalfWidth, groundY - armLength);
+           context.lineTo(cartX + coneHalfWidth, groundY - armLength);
+           context.closePath();
+           context.fill();
+           context.strokeStyle = coneStroke;
+           context.setLineDash([4, 4]);
+           context.beginPath();
+           context.moveTo(cartX, groundY);
+           context.lineTo(cartX - coneHalfWidth, groundY - armLength);
+           context.moveTo(cartX, groundY);
+           context.lineTo(cartX + coneHalfWidth, groundY - armLength);
+           context.stroke();
+           context.setLineDash([]);
+           context.strokeStyle = '#00ff41';
+           context.lineWidth = 1;
+           context.beginPath();
+           context.moveTo(cartX - 84, groundY);
+           context.lineTo(cartX + 84, groundY);
+           context.stroke();
+           context.fillStyle = coneStroke;
+           context.font = '12px Courier New';
+           context.fillText(stable ? 'STABLE WINDOW / EQUILIBRIUM' : 'RETURN TO EQUILIBRIUM', cartX - 115, groundY + 42);
+           context.strokeStyle = '#2d7337';
+           context.beginPath();
+           context.moveTo(0, groundY + 22);
+           context.lineTo(width, groundY + 22);
+           context.stroke();
+           context.fillStyle = '#00ff41';
+           context.fillRect(cartX - cartWidth / 2, groundY, cartWidth, 22);
+           let pendulumX = cartX;
+           let pendulumY = groundY;
+           for (let index = 0; index < dotCount; index += 1) {
+               const nextX = pendulumX + Math.sin(segmentAngles[index]) * armLength;
+               const nextY = pendulumY - Math.cos(segmentAngles[index]) * armLength;
+               context.strokeStyle = '#00ff41';
+               context.lineWidth = 4;
+               context.beginPath();
+               context.moveTo(pendulumX, pendulumY);
+               context.lineTo(nextX, nextY);
+               context.stroke();
+               context.fillStyle = '#ff003c';
+               context.beginPath();
+               context.arc(nextX, nextY, 9, 0, Math.PI * 2);
+               context.fill();
+               pendulumX = nextX;
+               pendulumY = nextY;
+           }
+           const graphTop = height * 0.72;
+           const graphHeight = height * 0.22;
+           context.lineWidth = 1;
+           context.strokeStyle = '#2d7337';
+           context.strokeRect(10, graphTop, width - 20, graphHeight);
+           context.font = '12px Courier New';
+           context.fillStyle = '#00ff41';
+           context.fillText('PHASE PLANE / ERROR SIGNAL', 18, graphTop + 16);
+           context.strokeStyle = '#ffaa00';
+           context.beginPath();
+           errorHistory.forEach((value, index) => {
+               const x = 12 + (index / Math.max(errorHistory.length - 1, 1)) * (width - 24);
+               const y = graphTop + graphHeight / 2 - value * graphHeight * 1.8;
+               index ? context.lineTo(x, y) : context.moveTo(x, y);
+           });
+           context.stroke();
+           context.strokeStyle = '#00aaff';
+           context.beginPath();
+           phaseHistory.forEach((point, index) => {
+               const x = 12 + ((point.angle + 0.5) / 1) * (width - 24);
+               const y = graphTop + graphHeight / 2 - point.rate * graphHeight * 0.12;
+               index ? context.lineTo(x, y) : context.moveTo(x, y);
+           });
+           context.stroke();
+       }
+       function frame(timestamp) {
+           if (!running || destroyed) return;
+           draw();
+           frameId = requestAnimationFrame(frame);
+       }
+       function physicsTick() {
+           if (!running || destroyed) return;
+           const dt = 0.05;
+           elapsed += dt;
+           updatePhysics(dt);
+           if (elapsed - lastDashboard >= 0.1) {
+               lastDashboard = elapsed;
+               updateDashboard();
+           }
+           lastTelemetry += dt * 1000;
+           if (lastTelemetry >= 1000) {
+               lastTelemetry = 0;
+               updateDashboard();
+           }
+       }
+       return {
+           init() {
+               [kpInput, kiInput, kdInput].forEach(input => {
+                   const handler = updateGainLabel;
+                   handlers.set(input, handler);
+                   input.addEventListener('input', handler);
+               });
+               handlers.set(resetButton, reset);
+               const leftShockHandler = () => triggerShock(-1);
+               const rightShockHandler = () => triggerShock(1);
+               handlers.set(shockLeftButton, leftShockHandler);
+               handlers.set(shockRightButton, rightShockHandler);
+               resetButton.addEventListener('click', reset);
+               shockLeftButton.addEventListener('click', leftShockHandler);
+               shockRightButton.addEventListener('click', rightShockHandler);
+               reset();
+           },
+           start() {
+               if (destroyed || running) return;
+               running = true;
+               status.textContent = '[SYS] PID loop closed. Wind field active.';
+               physicsTimer = setInterval(physicsTick, 50);
+               frameId = requestAnimationFrame(frame);
+           },
+           pause() {
+               running = false;
+               if (elapsed > 0 && !scoreSubmitted) {
+                   scoreSubmitted = true;
+                   submitArcadeScore('pid-stabilizer', elapsed, `${elapsed.toFixed(1)}s survival`, { stability: Number(stabilityEl.textContent.replace('%', '')) || 0, dots: dotCount });
+               }
+               if (frameId !== null) cancelAnimationFrame(frameId);
+               if (physicsTimer !== null) clearInterval(physicsTimer);
+               frameId = null;
+               physicsTimer = null;
+               lastFrame = 0;
+               status.textContent = '[SYS] Stabilizer paused. State preserved.';
+           },
+           destroy() {
+               destroyed = true;
+               this.pause();
+               handlers.forEach((handler, element) => {
+                   element.removeEventListener(element === kpInput || element === kiInput || element === kdInput ? 'input' : 'click', handler);
+               });
+               handlers.clear();
+           }
+       };
+   }
+
+   class MinigameManager {
+       constructor(host, selector, descriptors) {
+           this.host = host;
+           this.selector = selector;
+           this.descriptors = new Map(descriptors.map(descriptor => [descriptor.id, descriptor]));
+           this.instances = new Map();
+           this.activeId = null;
+           this.transitioning = false;
+           this.destroyed = false;
+           this.statusEl = document.getElementById('system-status');
+           this.leaderboardEl = document.getElementById('leaderboard-results');
+       }
+       telemetry(message) {
+           if (this.activeId === 'semantic-guesser') return;
+           this.statusEl.textContent = message;
+       }
+       renderTabs() {
+           this.selector.innerHTML = '';
+           this.descriptors.forEach(descriptor => {
+               const button = document.createElement('button');
+               button.type = 'button';
+               button.className = 'btn';
+               button.dataset.gameId = descriptor.id;
+               button.setAttribute('role', 'tab');
+               button.setAttribute('aria-selected', 'false');
+               button.setAttribute('tabindex', '-1');
+               button.textContent = `[ ${descriptor.label} ]`;
+               button.addEventListener('click', () => this.switchTo(descriptor.id));
+               button.addEventListener('keydown', event => {
+                   if (event.key !== 'ArrowRight' && event.key !== 'ArrowLeft') return;
+                   event.preventDefault();
+                   const buttons = Array.from(this.selector.querySelectorAll('[role="tab"]'));
+                   const currentIndex = buttons.indexOf(button);
+                   const offset = event.key === 'ArrowRight' ? 1 : -1;
+                   const nextButton = buttons[(currentIndex + offset + buttons.length) % buttons.length];
+                   this.switchTo(nextButton.dataset.gameId);
+                   nextButton.focus();
+               });
+               this.selector.appendChild(button);
+           });
+       }
+       switchTo(gameId) {
+           if (this.destroyed || this.transitioning || gameId === this.activeId) return;
+           const descriptor = this.descriptors.get(gameId);
+           if (!descriptor) {
+               this.statusEl.textContent = `[SYS] ERROR: Unknown minigame ${gameId}.`;
+               return;
+           }
+           this.transitioning = true;
+           if (this.activeId) {
+               ArcadeLeaderboard.cancel(this.activeId);
+               const previous = this.instances.get(this.activeId);
+               previous.game.pause();
+               previous.root.hidden = true;
+           }
+           let instance = this.instances.get(gameId);
+           if (!instance) {
+               const root = document.getElementById(descriptor.rootId);
+               instance = { root, game: descriptor.create(root, message => this.telemetry(message)) };
+               this.instances.set(gameId, instance);
+               instance.game.init();
+           }
+           instance.root.hidden = false;
+           this.activeId = gameId;
+           instance.game.start();
+           managerLifecycle++;
+           renderArcadeLeaderboard(gameId, managerLifecycle);
+           this.selector.querySelectorAll('[role="tab"]').forEach(button => {
+               const selected = button.dataset.gameId === gameId;
+               button.setAttribute('aria-selected', String(selected));
+               button.setAttribute('tabindex', selected ? '0' : '-1');
+           });
+           this.transitioning = false;
+       }
+       destroyAll() {
+           if (this.destroyed) return;
+           this.destroyed = true;
+           this.instances.forEach(instance => instance.game.destroy());
+       }
+   }
+
+   const semanticRoot = document.getElementById('semantic-guesser-game');
+   const traderRoot = document.getElementById('algo-trader-game');
+   const selector = document.getElementById('minigame-selector');
+   const manager = new MinigameManager(document.getElementById('minigame-host'), selector, [
+       { id: 'semantic-guesser', label: 'Semantic Guesser', rootId: 'semantic-guesser-game', create: root => createSemanticGuesser(root) },
+       { id: 'algo-trader-1987', label: 'ALGO_TRADER_1987', rootId: 'algo-trader-game', create: (root, telemetry) => createAlgoTrader(root, telemetry) },
+       { id: 'stochastic-navigator', label: 'STOCHASTIC_NAVIGATOR', rootId: 'stochastic-navigator-game', create: (root, telemetry) => createStochasticNavigator(root, telemetry) },
+       { id: 'quantum-craps', label: 'QUANTUM_CRAPS', rootId: 'quantum-craps-game', create: (root, telemetry) => createQuantumCraps(root, telemetry) },
+       { id: 'pid-stabilizer', label: 'PID_STABILIZER', rootId: 'pid-stabilizer-game', create: (root, telemetry) => createPidStabilizer(root, telemetry) },
+       { id: 'dungeon-automata', label: 'DUNGEON_AUTOMATA', rootId: 'dungeon-automata-game', create: (root, telemetry) => createDungeonAutomata(root, telemetry) }
+   ]);
+   manager.renderTabs();
+   document.getElementById('jump-to-minigame').addEventListener('click', function() {
+       this.classList.remove('blink-prompt');
+   });
+   window.addEventListener('pagehide', () => {
+       manager.destroyAll();
+   }, { once: true });
+   manager.switchTo('semantic-guesser');
 </script>
 </body>
 </html>

@@ -522,12 +522,23 @@
        "synapse", "syntax", "telemetry", "tensor", "thread", "token", "transaction", "tunnel", "unicode", "utility", "variable", "vector",
        "virtual", "virtualization", "vulnerability", "websocket", "widget", "workflow"
    ];
-
+    const animalDictionary = [
+        "albatross", "alligator", "alpaca", "antelope", "armadillo", "baboon", "badger", "barracuda", "beaver", "buffalo",
+        "butterfly", "camel", "capybara", "caterpillar", "chameleon", "cheetah", "chimpanzee", "chinchilla", "chipmunk",
+        "cobra", "cougar", "coyote", "crocodile", "dingo", "dolphin", "dragonfly", "eagle", "echidna", "elephant", "falcon",
+        "ferret", "flamingo", "gazelle", "gecko", "gerbil", "giraffe", "gopher", "gorilla", "grasshopper", "hamster",
+        "hedgehog", "hippopotamus", "hummingbird", "hyena", "iguana", "jackal", "jaguar", "jellyfish", "kangaroo", "koala",
+        "lemur", "leopard", "llama", "lobster", "macaw", "manatee", "meerkat", "mongoose", "monkey", "mosquito", "octopus",
+        "opossum", "orangutan", "ostrich", "otter", "panther", "parrot", "peacock", "pelican", "penguin", "platypus",
+        "porcupine", "puma", "rabbit", "raccoon", "reindeer", "rhinoceros", "salamander", "scorpion", "seahorse", "shark",
+        "skunk", "sloth", "squid", "squirrel", "starfish", "stingray", "swallow", "tapir", "tiger", "tortoise", "toucan",
+        "turtle", "vulture", "walrus", "weasel", "whale", "wolverine", "wombat", "woodpecker", "zebra"
+    ];
    function createSemanticGuesser(root) {
        const now = new Date();
        const startOfYear = new Date(now.getFullYear(), 0, 1);
        const dayOfYear = Math.floor((now - startOfYear) / (1000 * 60 * 60 * 24));
-       const dailyTargetWord = techDictionary[dayOfYear % techDictionary.length];
+       const dailyTargetWord = animalDictionary[dayOfYear % animalDictionary.length];
        const visitorName = `agent_${Math.floor(1000 + Math.random() * 9000)}`;
        const statusEl = root.querySelector('#system-status');
        const input = root.querySelector('#guess-input');
